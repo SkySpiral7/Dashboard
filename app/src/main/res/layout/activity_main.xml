@@ -23,6 +23,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/locationValue"
         app:srcCompat="@drawable/refresh"
+        android:onClick="refreshOnClick"
         tools:layout_editor_absoluteY="58dp" />
 
     <ImageView

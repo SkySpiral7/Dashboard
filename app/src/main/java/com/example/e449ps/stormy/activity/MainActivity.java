@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private LocationFacade locationFacade;
     private Location lastKnownLocation;
     private ActivityMainBinding binding;
+    private boolean inInitialState;
 
     public MainActivity() {
         weatherConverter = new WeatherConverter(new Gson());
@@ -62,15 +63,9 @@ public class MainActivity extends AppCompatActivity {
         iconImageView = findViewById(R.id.iconImageView);
 
         ImageView refreshImage = findViewById(R.id.refreshImageView);
-        refreshImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "Refreshing", Toast.LENGTH_SHORT).show();
-                locationFacade.askForLocation();
-            }
-        });
         displayWeather = null;
         lastKnownLocation = null;
+        inInitialState = true;
         locationFacade = new LocationFacade(this, this::locationRationalDialog, this::locationCallback, () -> {
         });
     }
@@ -79,8 +74,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         locationFacade.connect();
-        if (lastKnownLocation == null) {
-            //should only happen on start up
+        if (inInitialState) {
+            //use boolean instead of lastKnownLocation==null to avoid this happening more than once in a row
+            inInitialState = false;
             Toast.makeText(this, "Loading", Toast.LENGTH_SHORT).show();
             locationFacade.askForLocation();
         }
@@ -98,6 +94,11 @@ public class MainActivity extends AppCompatActivity {
         locationFacade.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
+    public void refreshOnClick(View unused) {
+        Toast.makeText(MainActivity.this, "Refreshing", Toast.LENGTH_SHORT).show();
+        locationFacade.askForLocation();
+    }
+
     private void locationRationalDialog(DialogInterface.OnClickListener listener) {
         new AlertDialog.Builder(this)
                 .setTitle(R.string.title_location_permission)
@@ -113,12 +114,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean isNetworkConnected() {
+        //TODO: how does this compare to LocationFacade methods?
         ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = manager.getActiveNetworkInfo();
         return networkInfo != null && networkInfo.isConnected();
     }
 
-    public void hourlyOnClick(View view) {
+    public void hourlyOnClick(View unused) {
         List<HourlyWeather> hourlyWeather = displayWeather.getHourlyWeather();
         Intent intent = new Intent(this, HourlyForecastActivity.class);
         intent.putParcelableArrayListExtra(HourlyForecastActivity.HOUR_EXTRA, new ArrayList<Parcelable>(hourlyWeather));
