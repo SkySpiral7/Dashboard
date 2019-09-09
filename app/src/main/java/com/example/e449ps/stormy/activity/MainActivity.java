@@ -1,12 +1,10 @@
 package com.example.e449ps.stormy.activity;
 
 import android.content.Context;
-import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
@@ -22,11 +20,7 @@ import com.example.e449ps.stormy.databinding.ActivityMainBinding;
 import com.example.e449ps.stormy.dialog.GeneralErrorDialogFragment;
 import com.example.e449ps.stormy.dialog.NetworkErrorDialogFragment;
 import com.example.e449ps.stormy.model.DisplayWeather;
-import com.example.e449ps.stormy.model.HourlyWeather;
 import com.google.gson.Gson;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import okhttp3.OkHttpClient;
 
@@ -39,12 +33,6 @@ public class MainActivity extends AppCompatActivity {
     public MainActivity() {
         weatherConverter = new WeatherConverter(new Gson());
         OkHttpClient client = new OkHttpClient();
-//        client = new OkHttpClient.Builder().hostnameVerifier(new HostnameVerifier() {
-//            @Override
-//            public boolean verify(String hostname, SSLSession session) {
-//                return true;
-//            }
-//        }).build();
         forecastService = new ForecastService(client, new OkResponseConverter());
     }
 
@@ -81,13 +69,6 @@ public class MainActivity extends AppCompatActivity {
         ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = manager.getActiveNetworkInfo();
         return networkInfo != null && networkInfo.isConnected();
-    }
-
-    public void hourlyOnClick(View view) {
-        List<HourlyWeather> hourlyWeather = displayWeather.getHourlyWeather();
-        Intent intent = new Intent(this, HourlyForecastActivity.class);
-        intent.putParcelableArrayListExtra(HourlyForecastActivity.HOUR_EXTRA, new ArrayList<Parcelable>(hourlyWeather));
-        startActivity(intent);
     }
 
     private void getForecast(final ActivityMainBinding binding, double latitude, double longitude) {

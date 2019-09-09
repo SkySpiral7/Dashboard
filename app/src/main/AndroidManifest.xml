@@ -21,15 +21,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".activity.HourlyForecastActivity"
-            android:label="@string/title_activity_hourly_forecast"
-            android:parentActivityName=".activity.MainActivity"
-            android:theme="@style/AppTheme">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.e449ps.stormy.activity.MainActivity" />
-        </activity>
     </application>
 
 </manifest>
