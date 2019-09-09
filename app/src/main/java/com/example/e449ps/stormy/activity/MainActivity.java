@@ -2,12 +2,12 @@ package com.example.e449ps.stormy.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.ImageView;

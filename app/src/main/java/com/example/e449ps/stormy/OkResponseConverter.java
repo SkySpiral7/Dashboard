@@ -1,6 +1,6 @@
 package com.example.e449ps.stormy;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import okhttp3.Headers;
 import okhttp3.Response;

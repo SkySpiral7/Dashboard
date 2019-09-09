@@ -1,17 +1,15 @@
 package com.example.e449ps.stormy.activity;
 
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.e449ps.stormy.HourlyAdapter;
 import com.example.e449ps.stormy.R;
 import com.example.e449ps.stormy.databinding.ActivityHourlyForecastBinding;
 import com.example.e449ps.stormy.model.HourlyWeather;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 public class HourlyForecastActivity extends AppCompatActivity {
