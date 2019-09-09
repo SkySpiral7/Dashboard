@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="hour"
+            type="com.example.e449ps.stormy.model.HourlyWeather" />
+    </data>
+
+    <RelativeLayout
+        android:id="@+id/hourlyListView"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        tools:background="@color/appBackground">
+
+        <TextView
+            android:id="@+id/timeTextView"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="false"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="17dp"
+            android:layout_marginTop="45dp"
+            android:text="@{hour.formattedTime}"
+            android:textColor="@android:color/white"
+            android:textSize="24sp"
+            tools:text="12 pm" />
+
+        <ImageView
+            android:id="@+id/iconImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/timeTextView"
+            app:imageResource="@{hour.iconId}"
+            app:srcCompat="@drawable/partly_cloudy" />
+
+        <TextView
+            android:id="@+id/summaryTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@+id/temperatureTextView"
+            android:layout_toEndOf="@+id/iconImageView"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:text="@{hour.summary}"
+            android:textColor="@android:color/white"
+            android:textSize="24sp"
+            tools:text="Partly Cloudy" />
+
+        <TextView
+            android:id="@+id/temperatureTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="false"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:text="@{String.valueOf((int) Math.round(hour.temperature))}"
+            android:textColor="@android:color/white"
+            android:textSize="24sp"
+            tools:text="100" />
+
+    </RelativeLayout>
+</layout>
