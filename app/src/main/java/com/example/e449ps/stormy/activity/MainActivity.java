@@ -1,13 +1,13 @@
 package com.example.e449ps.stormy.activity;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import androidx.databinding.DataBindingUtil;
+import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Parcelable;
-import androidx.appcompat.app.AppCompatActivity;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.ImageView;
@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.e449ps.stormy.ForecastService;
+import com.example.e449ps.stormy.LocationFacade;
 import com.example.e449ps.stormy.OkResponseConverter;
 import com.example.e449ps.stormy.R;
 import com.example.e449ps.stormy.WeatherConverter;
@@ -28,6 +29,10 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
 import okhttp3.OkHttpClient;
 
 public class MainActivity extends AppCompatActivity {
@@ -35,16 +40,13 @@ public class MainActivity extends AppCompatActivity {
     private WeatherConverter weatherConverter;
     private ForecastService forecastService;
     private DisplayWeather displayWeather;
+    private LocationFacade locationFacade;
+    private Location lastKnownLocation;
+    private ActivityMainBinding binding;
 
     public MainActivity() {
         weatherConverter = new WeatherConverter(new Gson());
         OkHttpClient client = new OkHttpClient();
-//        client = new OkHttpClient.Builder().hostnameVerifier(new HostnameVerifier() {
-//            @Override
-//            public boolean verify(String hostname, SSLSession session) {
-//                return true;
-//            }
-//        }).build();
         forecastService = new ForecastService(client, new OkResponseConverter());
     }
 
@@ -52,29 +54,62 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         TextView darkSky = findViewById(R.id.darkSkyAttribution);
         darkSky.setMovementMethod(LinkMovementMethod.getInstance());
 
         iconImageView = findViewById(R.id.iconImageView);
 
-        //old: 37.8267, -122.4233
-        //me: 38.792909, -90.627005
-        final double latitude = 38.792909;
-        final double longitude = -90.627005;
-
         ImageView refreshImage = findViewById(R.id.refreshImageView);
         refreshImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(MainActivity.this, "Refreshing", Toast.LENGTH_SHORT).show();
-                getForecast(binding, latitude, longitude);
+                locationFacade.askForLocation();
             }
         });
         displayWeather = null;
-        Toast.makeText(this, "Loading", Toast.LENGTH_SHORT).show();
-        getForecast(binding, latitude, longitude);
+        lastKnownLocation = null;
+        locationFacade = new LocationFacade(this, this::locationRationalDialog, this::locationCallback, () -> {
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        locationFacade.connect();
+        if (lastKnownLocation == null) {
+            //should only happen on start up
+            Toast.makeText(this, "Loading", Toast.LENGTH_SHORT).show();
+            locationFacade.askForLocation();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        locationFacade.disconnect();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        locationFacade.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    private void locationRationalDialog(DialogInterface.OnClickListener listener) {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.title_location_permission)
+                .setMessage(R.string.text_location_permission)
+                .setPositiveButton(R.string.ok, listener)
+                .create()
+                .show();
+    }
+
+    private void locationCallback(Location newLocation) {
+        lastKnownLocation = newLocation;
+        getForecast(binding, lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
     }
 
     public boolean isNetworkConnected() {

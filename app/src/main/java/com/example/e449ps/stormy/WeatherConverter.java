@@ -35,7 +35,7 @@ public class WeatherConverter {
         currentWeather.setTemperature(currently.getTemperature());
         //above is is 1:1 mapping
 
-        currentWeather.setLocationLabel("Alcatraz Island, CA");
+        currentWeather.setLocationLabel("Your location");
         SimpleDateFormat simpleDateFormatter = new SimpleDateFormat("h:mm a");
         simpleDateFormatter.setTimeZone(timeZone);
         Date forecastDate = new Date(currently.getTime() * 1000);

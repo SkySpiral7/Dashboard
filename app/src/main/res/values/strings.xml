@@ -6,4 +6,7 @@
     <string name="network_unavailable_message">No network connection</string>
     <string name="powered_by_dark_sky"><a href="https://darksky.net/poweredby/">Powered by Dark Sky</a></string>
     <string name="title_activity_hourly_forecast">HourlyForecastActivity</string>
+    <string name="title_location_permission">Location Required</string>
+    <string name="text_location_permission">I need your GPS to get the weather.</string>
+    <string name="ok">OK</string>
 </resources>
