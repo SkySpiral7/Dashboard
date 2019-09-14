@@ -1,9 +1,6 @@
 package com.example.e449ps.stormy;
 
 import android.content.Context;
-import androidx.databinding.DataBindingUtil;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -11,6 +8,10 @@ import com.example.e449ps.stormy.databinding.HourlyListItemBinding;
 import com.example.e449ps.stormy.model.HourlyWeather;
 
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class HourlyAdapter extends RecyclerView.Adapter<HourlyAdapter.ViewHolder> {
     private final List<HourlyWeather> hourlyWeatherList;

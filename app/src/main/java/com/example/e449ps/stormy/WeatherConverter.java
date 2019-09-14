@@ -15,10 +15,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class WeatherConverter {
     private static final String TAG = WeatherConverter.class.getSimpleName();
     private Gson gson;
 
+    @Inject
     public WeatherConverter(Gson gson) {
         this.gson = gson;
     }

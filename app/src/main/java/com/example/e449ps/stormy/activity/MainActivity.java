@@ -19,15 +19,17 @@ import com.example.e449ps.stormy.LocationFacade;
 import com.example.e449ps.stormy.OkResponseConverter;
 import com.example.e449ps.stormy.R;
 import com.example.e449ps.stormy.WeatherConverter;
+import com.example.e449ps.stormy.dagger.Dagger;
 import com.example.e449ps.stormy.databinding.ActivityMainBinding;
 import com.example.e449ps.stormy.dialog.GeneralErrorDialogFragment;
 import com.example.e449ps.stormy.dialog.NetworkErrorDialogFragment;
 import com.example.e449ps.stormy.model.DisplayWeather;
 import com.example.e449ps.stormy.model.HourlyWeather;
-import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -37,7 +39,8 @@ import okhttp3.OkHttpClient;
 
 public class MainActivity extends AppCompatActivity {
     private ImageView iconImageView;
-    private WeatherConverter weatherConverter;
+    @Inject
+    WeatherConverter weatherConverter;
     private ForecastService forecastService;
     private DisplayWeather displayWeather;
     private LocationFacade locationFacade;
@@ -46,13 +49,14 @@ public class MainActivity extends AppCompatActivity {
     private boolean inInitialState;
 
     public MainActivity() {
-        weatherConverter = new WeatherConverter(new Gson());
+        //TODO: adopt dagger
         OkHttpClient client = new OkHttpClient();
         forecastService = new ForecastService(client, new OkResponseConverter());
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Dagger.getDagger().inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
@@ -62,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
 
         iconImageView = findViewById(R.id.iconImageView);
 
-        ImageView refreshImage = findViewById(R.id.refreshImageView);
         displayWeather = null;
         lastKnownLocation = null;
         inInitialState = true;
