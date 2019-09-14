@@ -16,7 +16,6 @@ import android.widget.Toast;
 
 import com.example.e449ps.stormy.ForecastService;
 import com.example.e449ps.stormy.LocationFacade;
-import com.example.e449ps.stormy.OkResponseConverter;
 import com.example.e449ps.stormy.R;
 import com.example.e449ps.stormy.WeatherConverter;
 import com.example.e449ps.stormy.dagger.Dagger;
@@ -35,13 +34,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
-import okhttp3.OkHttpClient;
 
 public class MainActivity extends AppCompatActivity {
     private ImageView iconImageView;
     @Inject
     WeatherConverter weatherConverter;
-    private ForecastService forecastService;
+    @Inject
+    ForecastService forecastService;
     private DisplayWeather displayWeather;
     private LocationFacade locationFacade;
     private Location lastKnownLocation;
@@ -49,9 +48,6 @@ public class MainActivity extends AppCompatActivity {
     private boolean inInitialState;
 
     public MainActivity() {
-        //TODO: adopt dagger
-        OkHttpClient client = new OkHttpClient();
-        forecastService = new ForecastService(client, new OkResponseConverter());
     }
 
     @Override

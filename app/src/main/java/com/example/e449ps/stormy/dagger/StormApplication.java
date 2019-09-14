@@ -7,8 +7,8 @@ public class StormApplication extends Application {
     public void onCreate() {
         super.onCreate();
         Dagger.setDagger(
-                DaggerConditionComponent.builder()
-                        .stormProvider(new StormProvider())
+                DaggerStormComponent.builder()
+                        .stormModule(new StormModule())
                         .build());
         Dagger.getDagger().inject(this);
     }

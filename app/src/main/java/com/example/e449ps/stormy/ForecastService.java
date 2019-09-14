@@ -7,6 +7,9 @@ import com.google.gson.JsonSyntaxException;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -14,6 +17,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
+@Singleton
 public class ForecastService {
     private static final String TAG = ForecastService.class.getSimpleName();
     private static final String darkSkyBaseUrl = "https://api.darksky.net";
@@ -22,6 +26,7 @@ public class ForecastService {
     private OkHttpClient client;
     private OkResponseConverter okResponseConverter;
 
+    @Inject
     public ForecastService(OkHttpClient client, OkResponseConverter okResponseConverter) {
         this.client = client;
         this.okResponseConverter = okResponseConverter;

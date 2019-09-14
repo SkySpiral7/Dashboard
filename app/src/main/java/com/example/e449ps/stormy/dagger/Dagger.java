@@ -1,16 +1,17 @@
 package com.example.e449ps.stormy.dagger;
 
 public final class Dagger {
-    private static ConditionComponent INSTANCE;
+    private static StormComponent INSTANCE;
 
     private Dagger() {
+        //TODO: is this really needed? clean up all dagger
     }
 
-    public static ConditionComponent getDagger() {
+    public static StormComponent getDagger() {
         return INSTANCE;
     }
 
-    public static void setDagger(ConditionComponent component) {
+    public static void setDagger(StormComponent component) {
         INSTANCE = component;
     }
 }

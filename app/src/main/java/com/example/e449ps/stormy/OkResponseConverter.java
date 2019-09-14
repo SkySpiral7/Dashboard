@@ -1,10 +1,18 @@
 package com.example.e449ps.stormy;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import androidx.annotation.NonNull;
 import okhttp3.Headers;
 import okhttp3.Response;
 
+@Singleton
 public class OkResponseConverter {
+    @Inject
+    public OkResponseConverter() {
+    }
+
     @NonNull
     public String httpResponseAsString(Response response, String responseBody) {
         StringBuilder responseMessageBuilder = new StringBuilder();

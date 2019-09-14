@@ -7,8 +7,8 @@ import javax.inject.Singleton;
 import dagger.Component;
 
 @Singleton
-@Component(modules = {StormProvider.class})
-public interface ConditionComponent {
+@Component(modules = {StormModule.class})
+public interface StormComponent {
     void inject(StormApplication stormApplication);
 
     void inject(MainActivity mainActivity);
