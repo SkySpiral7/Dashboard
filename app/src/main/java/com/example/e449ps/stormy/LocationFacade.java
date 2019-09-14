@@ -139,6 +139,7 @@ public class LocationFacade {
     }
 
     private void lastLocationCallback() throws SecurityException {
+        //TODO: if app installed while screen locked this method is called but not locationCallback
         fusedLocationProviderClient.getLastLocation().addOnSuccessListener(activity, locationCallback);
         //onFailure doesn't seem to be called
     }

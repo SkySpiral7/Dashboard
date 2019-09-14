@@ -47,9 +47,6 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private boolean inInitialState;
 
-    public MainActivity() {
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Dagger.getDagger().inject(this);
