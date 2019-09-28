@@ -9,7 +9,5 @@ import dagger.Component;
 @Singleton
 @Component(modules = {StormModule.class})
 public interface StormComponent {
-    void inject(StormApplication stormApplication);
-
     void inject(MainActivity mainActivity);
 }

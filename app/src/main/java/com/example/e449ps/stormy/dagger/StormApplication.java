@@ -6,10 +6,6 @@ public class StormApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Dagger.setDagger(
-                DaggerStormComponent.builder()
-                        .stormModule(new StormModule())
-                        .build());
-        Dagger.getDagger().inject(this);
+        Dagger.set(DaggerStormComponent.create());
     }
 }

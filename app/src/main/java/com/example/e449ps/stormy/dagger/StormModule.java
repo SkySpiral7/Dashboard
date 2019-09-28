@@ -12,13 +12,13 @@ import okhttp3.OkHttpClient;
 public class StormModule {
     @Provides
     @Singleton
-    public Gson gson() {
+    public static Gson gson() {
         return new Gson();
     }
 
     @Provides
     @Singleton
-    public OkHttpClient okHttpClient() {
+    public static OkHttpClient okHttpClient() {
         return new OkHttpClient();
     }
 }

@@ -49,9 +49,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Dagger.getDagger().inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Dagger.get().inject(this);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         TextView darkSky = findViewById(R.id.darkSkyAttribution);
