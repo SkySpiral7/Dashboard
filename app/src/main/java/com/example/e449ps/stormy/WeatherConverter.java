@@ -16,9 +16,10 @@ import java.util.List;
 import java.util.TimeZone;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
-@Singleton
+import dagger.Reusable;
+
+@Reusable
 public class WeatherConverter {
     private static final String TAG = WeatherConverter.class.getSimpleName();
     private Gson gson;

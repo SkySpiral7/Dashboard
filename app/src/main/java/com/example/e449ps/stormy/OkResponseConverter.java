@@ -1,13 +1,13 @@
 package com.example.e449ps.stormy;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import androidx.annotation.NonNull;
+import dagger.Reusable;
 import okhttp3.Headers;
 import okhttp3.Response;
 
-@Singleton
+@Reusable
 public class OkResponseConverter {
     @Inject
     public OkResponseConverter() {
