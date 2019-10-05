@@ -28,8 +28,6 @@ import com.example.e449ps.stormy.model.HourlyWeather;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -37,10 +35,9 @@ import androidx.databinding.DataBindingUtil;
 
 public class MainActivity extends AppCompatActivity {
     private ImageView iconImageView;
-    @Inject
-    WeatherConverter weatherConverter;
-    @Inject
-    ForecastService forecastService;
+    //it's calling get() twice but really this whole thing should be in a ViewModel
+    private WeatherConverter weatherConverter = Dagger.get().weatherConverter();
+    private ForecastService forecastService = Dagger.get().forecastService();
     private DisplayWeather displayWeather;
     private LocationFacade locationFacade;
     private Location lastKnownLocation;
@@ -51,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Dagger.get().inject(this);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         TextView darkSky = findViewById(R.id.darkSkyAttribution);

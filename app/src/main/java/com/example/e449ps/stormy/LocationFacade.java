@@ -140,6 +140,7 @@ public class LocationFacade {
 
     private void lastLocationCallback() throws SecurityException {
         //TODO: if app installed while screen locked this method is called but not locationCallback
+        //read https://stackoverflow.com/questions/17613888/locationclient-doesnt-give-callback-when-screen-light-goes-off-but-my-wakefulth/39098830#39098830
         fusedLocationProviderClient.getLastLocation().addOnSuccessListener(activity, locationCallback);
         //onFailure doesn't seem to be called
     }

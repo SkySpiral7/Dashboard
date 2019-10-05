@@ -22,6 +22,10 @@ android {
     compileOptions {
         sourceCompatibility = '1.8'
         targetCompatibility = '1.8'
+        //TODO: no idea how to set these but they should help build speed
+//        '-Adagger.fastInit=enabled'
+//        '-Adagger.formatGeneratedSource=disabled'  //TODO: tip: leave enabled for prod code for the sake of stack traces
+//        '-Adagger.gradle.incremental=enabled'
     }
 }
 
