@@ -13,7 +13,7 @@ public class GeneralErrorDialogFragment extends DialogFragment {
         return new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.error_title)
                 .setMessage(R.string.error_message)
-                .setPositiveButton(R.string.error_button_ok_text, null)
+                .setPositiveButton(R.string.ok_text, null)
                 .create();
     }
 }

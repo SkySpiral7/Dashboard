@@ -60,7 +60,11 @@ public class LocationFacade {
     public LocationFacade(Activity activity, Consumer<DialogInterface.OnClickListener> justificationFactory, OnSuccessListener<Location> locationCallback, Runnable permissionDeniedCallback) {
         this.activity = activity;
         this.justificationFactory = justificationFactory;
-        this.locationCallback = locationCallback;
+        this.locationCallback = (Location it) -> {
+            //null means that it successfully contacted a disabled service...
+            //ignore this so that your callback only gets successful locations
+            if (it != null) locationCallback.onSuccess(it);
+        };
         this.permissionDeniedCallback = permissionDeniedCallback;
 
         googleApiClient = new GoogleApiClient.Builder(activity)
@@ -101,12 +105,12 @@ public class LocationFacade {
 
     public boolean isLocationEnabled() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            // This is new method provided in API 28
-            LocationManager lm = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
-            return lm.isLocationEnabled();
+            // This is a new method provided in API 28
+            LocationManager locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
+            return locationManager.isLocationEnabled();
         } else {
             // This is Deprecated in API 28
-            //there's also !manager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+            //there's also manager.isProviderEnabled(LocationManager.GPS_PROVIDER)
             int mode = Settings.Secure.getInt(activity.getContentResolver(), Settings.Secure.LOCATION_MODE,
                     Settings.Secure.LOCATION_MODE_OFF);
             return (mode != Settings.Secure.LOCATION_MODE_OFF);
@@ -118,6 +122,9 @@ public class LocationFacade {
                 Settings.Global.AIRPLANE_MODE_ON, 0) != 0;
     }
 
+    /**
+     * Will send attempt to send a location to the provided locationCallback. Will not send null.
+     */
     public void askForLocation() {
         if (!hasLocationPermission()) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(activity,

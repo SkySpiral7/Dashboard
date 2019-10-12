@@ -21,7 +21,7 @@ import com.example.e449ps.stormy.WeatherConverter;
 import com.example.e449ps.stormy.dagger.Dagger;
 import com.example.e449ps.stormy.databinding.ActivityMainBinding;
 import com.example.e449ps.stormy.dialog.GeneralErrorDialogFragment;
-import com.example.e449ps.stormy.dialog.NetworkErrorDialogFragment;
+import com.example.e449ps.stormy.dialog.InternetErrorDialogFragment;
 import com.example.e449ps.stormy.model.DisplayWeather;
 import com.example.e449ps.stormy.model.HourlyWeather;
 
@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         new AlertDialog.Builder(this)
                 .setTitle(R.string.title_location_permission)
                 .setMessage(R.string.text_location_permission)
-                .setPositiveButton(R.string.ok, listener)
+                .setPositiveButton(R.string.ok_text, listener)
                 .create()
                 .show();
     }
@@ -105,8 +105,10 @@ public class MainActivity extends AppCompatActivity {
         getForecast(binding, lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
     }
 
-    public boolean isNetworkConnected() {
-        //TODO: how does this compare to LocationFacade methods?
+    /**
+     * @return true if !airplaneMode && (Wi-Fi || cell data)
+     */
+    public boolean isConnectedToInternet() {
         ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = manager.getActiveNetworkInfo();
         return networkInfo != null && networkInfo.isConnected();
@@ -140,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
         dialog.show(getFragmentManager(), "error_dialogue");
     }
 
-    public void showNetworkErrorDialog() {
-        new NetworkErrorDialogFragment().show(getFragmentManager(), "network_error_dialogue");
+    public void showInternetErrorDialog() {
+        new InternetErrorDialogFragment().show(getFragmentManager(), "network_error_dialogue");
     }
 }

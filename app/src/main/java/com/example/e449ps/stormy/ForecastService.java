@@ -37,8 +37,8 @@ public class ForecastService {
     }
 
     public void getForecast(final MainActivity caller, final StringConsumer consumer, double latitude, double longitude) {
-        if (!caller.isNetworkConnected()) {
-            caller.showNetworkErrorDialog();
+        if (!caller.isConnectedToInternet()) {
+            caller.showInternetErrorDialog();
             return;
         }
         String forecastUrl = darkSkyBaseUrl + "/forecast/" + apiKey + "/" + latitude + "," + longitude;

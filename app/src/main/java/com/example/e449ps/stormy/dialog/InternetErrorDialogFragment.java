@@ -7,13 +7,13 @@ import android.os.Bundle;
 
 import com.example.e449ps.stormy.R;
 
-public class NetworkErrorDialogFragment extends DialogFragment {
+public class InternetErrorDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         return new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.error_title)
-                .setMessage(R.string.network_unavailable_message)
-                .setPositiveButton(R.string.error_button_ok_text, null)
+                .setMessage(R.string.internet_unavailable_message)
+                .setPositiveButton(R.string.ok_text, null)
                 .create();
     }
 }
