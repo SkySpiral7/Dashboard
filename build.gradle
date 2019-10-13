@@ -20,6 +20,13 @@ allprojects {
         google()
         jcenter()
     }
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            //formatGeneratedSource is disabled by default as of 2.23
+            //I didn't notice a difference from fastInit but https://dagger.dev/compiler-options suggests it
+            options.compilerArgs += ["-Adagger.fastInit=enabled"]
+        }
+    }
 }
 
 task clean(type: Delete) {

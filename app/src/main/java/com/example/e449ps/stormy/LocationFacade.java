@@ -63,6 +63,8 @@ public class LocationFacade {
         this.locationCallback = (Location it) -> {
             //null means that it successfully contacted a disabled service...
             //ignore this so that your callback only gets successful locations
+            //TODO: is null a single place to check if location is on?
+            //not sure if !airplane && isLocationEnabled is enough: does GPS work with internet off?
             if (it != null) locationCallback.onSuccess(it);
         };
         this.permissionDeniedCallback = permissionDeniedCallback;
