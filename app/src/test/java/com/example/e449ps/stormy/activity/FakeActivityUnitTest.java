@@ -21,10 +21,15 @@ import static org.junit.Assert.assertTrue;
 @Config(sdk = Build.VERSION_CODES.N)
 public class FakeActivityUnitTest {
     private FakeActivity testObject;
+/*TODO: legacy resources mode is deprecated
+[Robolectric] com.example.e449ps.stormy.activity.FakeActivityUnitTest.spinner_updateBackgroundColor: sdk=24; resources=LEGACY
+[Robolectric] NOTICE: legacy resources mode is deprecated; see http://robolectric.org/migrating/#migrating-to-40
+*/
 
     @Before
     public void setUp() {
         testObject = Robolectric.setupActivity(FakeActivity.class);
+        //TODO: upgrade off of Robolectric.setupActivity
 //        androidx.test.core.app.ActivityScenario.launch(MainActivity.class).;//.?(MainActivity.class);
     }
 

@@ -24,6 +24,8 @@ public class FakeActivity extends AppCompatActivity {
     TextView textView;
     Spinner colorSpinner;
     Button launchActivityButton;
+    //TODO: figure out test dagger for Espresso and Robolectric
+    //TODO: make tests for real classes and delete these
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

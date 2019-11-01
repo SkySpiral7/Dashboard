@@ -18,14 +18,10 @@ android {
     }
     testOptions {
         unitTests {
+            //needed for robolectric tests
             includeAndroidResources = true
         }
     }
-
-    useLibrary 'android.test.runner'
-
-    useLibrary 'android.test.base'
-    useLibrary 'android.test.mock'
     dataBinding {
         enabled = true
     }
@@ -53,11 +49,12 @@ dependencies {
 
     testImplementation 'junit:junit:4.12'
     testImplementation "org.mockito:mockito-core:3.1.0"
+
+    //For robolectric tests
     testImplementation 'org.robolectric:robolectric:4.3.1'
     testImplementation 'androidx.test:core:1.2.0'
 
+    //For instrumented tests
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test:rules:1.2.0'
 }
