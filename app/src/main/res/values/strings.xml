@@ -8,4 +8,11 @@
     <string name="title_activity_hourly_forecast">HourlyForecastActivity</string>
     <string name="title_location_permission">Location Required</string>
     <string name="text_location_permission">I need your GPS to get the weather.</string>
+
+    <string-array name="colors_array">
+        <item>White</item>
+        <item>Magenta</item>
+        <item>Green</item>
+        <item>Cyan</item>
+    </string-array>
 </resources>
