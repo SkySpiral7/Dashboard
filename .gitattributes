@@ -1,0 +1,18 @@
+#By default have git guess whether or not a file is binary.
+* text=auto
+
+#These are text files that should have end lines converted based on your system.
+*.gradle text
+*.java text
+*.md text
+*.properties text
+*.xml text
+.gitattributes text
+.gitignore text
+
+#These text files must have Windows line endings.
+*.bat text eol=crlf
+
+#These files are binary and should be left untouched to prevent corruption.
+*.jar binary
+*.png binary

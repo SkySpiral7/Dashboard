@@ -1,14 +1,12 @@
 package com.example.e449ps.stormy;
 
+import static org.junit.Assert.assertEquals;
+
 import android.content.Context;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import androidx.test.InstrumentationRegistry;
 import androidx.test.runner.AndroidJUnit4;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -17,11 +15,11 @@ import static org.junit.Assert.assertEquals;
  */
 @RunWith(AndroidJUnit4.class)
 public class ExampleInstrumentedTest {
-    @Test
-    public void useAppContext() throws Exception {
-        // Context of the app under test.
-        Context appContext = InstrumentationRegistry.getTargetContext();
+  @Test
+  public void useAppContext() throws Exception {
+    // Context of the app under test.
+    Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.example.e449ps.stormy", appContext.getPackageName());
-    }
+    assertEquals("com.example.e449ps.stormy", appContext.getPackageName());
+  }
 }
