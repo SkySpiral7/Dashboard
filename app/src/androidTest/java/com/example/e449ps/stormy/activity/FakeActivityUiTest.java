@@ -29,6 +29,7 @@ import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
@@ -82,5 +83,12 @@ public class FakeActivityUiTest {
 
         // Assert
         onView(withId(R.id.otherText)).check(matches(notNullValue()));
+    }
+
+    @Test
+    public void hasDagger() {
+        FakeActivity testObject = rule.getActivity();
+        assertNotNull(testObject);
+        assertNotNull(testObject.weatherConverter);
     }
 }

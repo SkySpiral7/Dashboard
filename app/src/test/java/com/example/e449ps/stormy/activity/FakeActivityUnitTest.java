@@ -15,6 +15,7 @@ import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricTestRunner.class)
@@ -63,5 +64,11 @@ public class FakeActivityUnitTest {
 
         Intent actual = Shadows.shadowOf(testObject).getNextStartedActivity();
         assertTrue(expected.filterEquals(actual));
+    }
+
+    @Test
+    public void hasDagger() {
+        assertNotNull(testObject);
+        assertNotNull(testObject.weatherConverter);
     }
 }

@@ -15,6 +15,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.e449ps.stormy.R;
+import com.example.e449ps.stormy.WeatherConverter;
+import com.example.e449ps.stormy.dagger.Dagger;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -24,6 +26,7 @@ public class FakeActivity extends AppCompatActivity {
     TextView textView;
     Spinner colorSpinner;
     Button launchActivityButton;
+    WeatherConverter weatherConverter = Dagger.get().weatherConverter();
     //TODO: figure out test dagger for Espresso and Robolectric
     //TODO: make tests for real classes and delete these
 
