@@ -10,5 +10,5 @@
         android:layout_height="wrap_content"
         android:id="@+id/otherText"
         android:text="Other Activity"
-        android:textSize="24sp"/>
+        android:textSize="24sp" />
 </LinearLayout>
