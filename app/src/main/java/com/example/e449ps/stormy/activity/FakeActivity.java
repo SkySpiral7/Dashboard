@@ -28,7 +28,7 @@ public class FakeActivity extends AppCompatActivity {
     Button launchActivityButton;
     WeatherConverter weatherConverter = Dagger.get().weatherConverter();
     //TODO: figure out test dagger for Espresso and Robolectric
-    //TODO: make tests for real classes and delete these
+    //then: make tests for real classes and delete these
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
