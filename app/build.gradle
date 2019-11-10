@@ -4,7 +4,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.example.e449ps.stormy"
-        minSdkVersion 24
+        minSdkVersion 23
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -16,15 +16,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    testOptions {
-        unitTests {
-            //needed for robolectric tests
-            includeAndroidResources = true
-        }
-    }
-    dataBinding {
-        enabled = true
-    }
+    //needed for robolectric tests
+    testOptions.unitTests.includeAndroidResources = true
+    dataBinding.enabled = true
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8

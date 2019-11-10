@@ -18,14 +18,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+/*
+[Robolectric] NOTICE: legacy resources mode is deprecated
+This is impossible to resolve in Android Studio 3.2 and shouldn't print out in 3.3+.
+*/
 @RunWith(RobolectricTestRunner.class)
-@Config(sdk = Build.VERSION_CODES.N)
+@Config(sdk = Build.VERSION_CODES.M)
 public class FakeActivityUnitTest {
     private FakeActivity testObject;
-/*TODO: legacy resources mode is deprecated
-[Robolectric] com.example.e449ps.stormy.activity.FakeActivityUnitTest.spinner_updateBackgroundColor: sdk=24; resources=LEGACY
-[Robolectric] NOTICE: legacy resources mode is deprecated; see http://robolectric.org/migrating/#migrating-to-40
-*/
 
     @Before
     public void setUp() {
