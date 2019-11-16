@@ -16,7 +16,8 @@ public class TestStormModule {
     @Provides
     @Reusable
     public static Gson gson() {
-        //Mockito can't mock it because it's a final class. Real version shouldn't hurt.
+        //Mockito can't mock it because it's a final class and has no interface or super class.
+        //Real version shouldn't hurt.
         return new Gson();
     }
 

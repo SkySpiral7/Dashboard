@@ -1,4 +1,4 @@
-package com.example.e449ps.stormy.activity;
+package com.example.e449ps.stormy;
 
 import android.app.Activity;
 import android.os.Build;

@@ -5,49 +5,28 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.view.inputmethod.EditorInfo;
 
-import com.example.e449ps.stormy.ForecastService;
+import com.example.e449ps.stormy.BaseRobolectricTest;
 import com.example.e449ps.stormy.dagger.Dagger;
-import com.example.e449ps.stormy.dagger.StormComponent;
-import com.example.e449ps.stormy.dagger.TestStormModule;
+import com.example.e449ps.stormy.dagger.DaggerTestStormComponent;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.robolectric.Shadows;
 
-import javax.inject.Singleton;
-
-import dagger.Component;
-import dagger.Module;
-import dagger.Provides;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 
 public class FakeActivityUnitTest extends BaseRobolectricTest {
-    @Module
-    public static class DoubleTestStormModule {
-        @Provides
-        @Singleton
-        public static ForecastService forecastService() {
-            return mock(ForecastService.class);
-        }
-    }
-
-    @Singleton
-    @Component(modules = {TestStormModule.class, DoubleTestStormModule.class})
-    public interface DoubleTestStormComponent extends StormComponent {
-    }
-
     @BeforeClass
     public static void setUpOnce() {
         //note order: @BeforeClass, TestApplication, @Before
+        //dagger will not run over the test folder therefore custom daggers need to be in mockServices or implemented here
         System.out.println();
 
         //TODO: test overriding the service
-        //Dagger.set(DaggerFakeActivityUnitTest_DoubleTestStormComponent.create());
-        Dagger.set(mock(StormComponent.class));
+        Dagger.set(DaggerTestStormComponent.create());
+//        Dagger.set(mock(StormComponent.class));
     }
 
     @Test

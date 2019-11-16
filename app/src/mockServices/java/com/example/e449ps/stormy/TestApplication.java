@@ -8,10 +8,13 @@ public class TestApplication extends StormApplication {
     @Override
     public void onCreate() {
         StormComponent originalComponent = Dagger.get();
-        super.onCreate();
         if (originalComponent == null || StormComponent.class.equals(originalComponent.getClass())) {
-            Dagger.set(DaggerTestStormComponent.create());
+            //default to test version if dagger didn't exist or was prod
+            originalComponent = DaggerTestStormComponent.create();
         }
+        super.onCreate();
+        //super.onCreate sets dagger to prod so set it back
+        Dagger.set(originalComponent);
         //TODO: what about running multiple Dagger tests? will it pollute? will need each test to clean up
     }
 }
