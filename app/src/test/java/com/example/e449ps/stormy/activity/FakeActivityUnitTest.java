@@ -8,8 +8,8 @@ import android.view.inputmethod.EditorInfo;
 import com.example.e449ps.stormy.ForecastService;
 import com.example.e449ps.stormy.dagger.Dagger;
 import com.example.e449ps.stormy.dagger.StormComponent;
+import com.example.e449ps.stormy.dagger.TestStormModule;
 
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.robolectric.Shadows;

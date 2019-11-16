@@ -2,7 +2,6 @@ package com.example.e449ps.stormy;
 
 import com.example.e449ps.stormy.activity.DaggerTestStormComponent;
 import com.example.e449ps.stormy.dagger.Dagger;
-import com.example.e449ps.stormy.dagger.StormApplication;
 import com.example.e449ps.stormy.dagger.StormComponent;
 
 public class TestApplication extends StormApplication {

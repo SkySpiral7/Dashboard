@@ -9,15 +9,14 @@ import com.example.e449ps.stormy.ForecastService;
 import com.example.e449ps.stormy.R;
 import com.example.e449ps.stormy.dagger.Dagger;
 import com.example.e449ps.stormy.dagger.StormComponent;
+import com.example.e449ps.stormy.dagger.TestStormModule;
 
 import org.hamcrest.Description;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.mockito.MockitoAnnotations;
 
 import javax.inject.Singleton;
 

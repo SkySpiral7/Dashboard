@@ -1,4 +1,4 @@
-package com.example.e449ps.stormy.activity;
+package com.example.e449ps.stormy.dagger;
 
 import com.google.gson.Gson;
 

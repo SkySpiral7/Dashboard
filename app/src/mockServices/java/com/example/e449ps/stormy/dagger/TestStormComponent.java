@@ -1,6 +1,4 @@
-package com.example.e449ps.stormy.activity;
-
-import com.example.e449ps.stormy.dagger.StormComponent;
+package com.example.e449ps.stormy.dagger;
 
 import javax.inject.Singleton;
 
