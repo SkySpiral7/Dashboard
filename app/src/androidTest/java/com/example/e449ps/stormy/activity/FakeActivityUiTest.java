@@ -5,27 +5,20 @@ import android.graphics.drawable.ColorDrawable;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import com.example.e449ps.stormy.ForecastService;
 import com.example.e449ps.stormy.R;
 import com.example.e449ps.stormy.dagger.Dagger;
-import com.example.e449ps.stormy.dagger.StormComponent;
-import com.example.e449ps.stormy.dagger.TestStormModule;
+import com.example.e449ps.stormy.dagger.TestStormComponent;
 
 import org.hamcrest.Description;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import javax.inject.Singleton;
-
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.espresso.matcher.BoundedMatcher;
 import androidx.test.rule.ActivityTestRule;
-import dagger.Component;
-import dagger.Module;
-import dagger.Provides;
+import okhttp3.OkHttpClient;
 
 import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
@@ -40,7 +33,8 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.mock;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
 
 /**
  * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
@@ -50,26 +44,7 @@ public class FakeActivityUiTest {
     @Rule
     public ActivityTestRule<FakeActivity> rule = new ActivityTestRule<>(FakeActivity.class);
 
-    //TODO: where do I put these service examples?
-    @Module
-    public static class DoubleTestStormModule {
-        @Provides
-        @Singleton
-        public static ForecastService forecastService() {
-            return mock(ForecastService.class);
-        }
-    }
-
-    @Singleton
-    @Component(modules = {TestStormModule.class, DoubleTestStormModule.class})
-    public interface DoubleTestStormComponent extends StormComponent {
-    }
-
-    @BeforeClass
-    public static void setUpOnce() {
-        //note order: TestApplication, @BeforeClass, @Before
-        Dagger.set(DaggerFakeActivityUiTest_DoubleTestStormComponent.create());
-    }
+    private OkHttpClient client = Dagger.get().okHttpClient();
 
     @Test
     public void editTextUpdatesTextView() {
@@ -118,16 +93,14 @@ public class FakeActivityUiTest {
     }
 
     @Test
-    public void hasDagger() {
-        FakeActivity testObject = rule.getActivity();
-        assertNotNull(testObject);
-        assertNotNull(testObject.weatherConverter);
-        assertNotNull(testObject.forecastService);
-    }
-
-    @Test
     public void hasTestDagger() {
         FakeActivity testObject = rule.getActivity();
-        testObject.useService();
+        assertNotNull(testObject);
+        assertNotNull(Dagger.get());
+        assertNotNull(testObject.weatherConverter);
+        assertNotNull(testObject.forecastService);
+        assertThat(Dagger.get(), is(instanceOf(TestStormComponent.class)));
+        assertNotNull(testObject.forecastService.client);
+        assertSame(testObject.forecastService.client, client);
     }
 }

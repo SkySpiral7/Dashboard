@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 
+import androidx.annotation.VisibleForTesting;
 import dagger.Reusable;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -23,7 +24,8 @@ public class ForecastService {
     private static final String darkSkyBaseUrl = "https://api.darksky.net";
     private static final String apiKey = "61d409957e62d46af62a7a99618d5141";
 
-    private OkHttpClient client;
+    @VisibleForTesting
+    public OkHttpClient client;
     private OkResponseConverter okResponseConverter;
 
     @Inject
@@ -76,6 +78,7 @@ public class ForecastService {
                         });
     }
 
+    @VisibleForTesting
     public void somethingSilly() {
         String forecastUrl = darkSkyBaseUrl + "/forecast/" + apiKey + "/";
         Request request =

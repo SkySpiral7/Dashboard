@@ -7,17 +7,25 @@ import android.view.inputmethod.EditorInfo;
 
 import com.example.e449ps.stormy.BaseRobolectricTest;
 import com.example.e449ps.stormy.dagger.Dagger;
-import com.example.e449ps.stormy.dagger.DaggerTestStormComponent;
+import com.example.e449ps.stormy.dagger.TestStormComponent;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.robolectric.Shadows;
 
+import okhttp3.OkHttpClient;
+
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class FakeActivityUnitTest extends BaseRobolectricTest {
+    private OkHttpClient client = Dagger.get().okHttpClient();
+
     @BeforeClass
     public static void setUpOnce() {
         //note order: @BeforeClass, TestApplication, @Before
@@ -25,7 +33,7 @@ public class FakeActivityUnitTest extends BaseRobolectricTest {
         System.out.println();
 
         //TODO: test overriding the service
-        Dagger.set(DaggerTestStormComponent.create());
+//        Dagger.set(DaggerTestStormComponent.create());
 //        Dagger.set(mock(StormComponent.class));
     }
 
@@ -68,18 +76,15 @@ public class FakeActivityUnitTest extends BaseRobolectricTest {
     }
 
     @Test
-    public void hasDagger() {
+    public void hasTestDagger() {
         forActivity(FakeActivity.class, testObject -> {
             assertNotNull(testObject);
+            assertNotNull(Dagger.get());
             assertNotNull(testObject.weatherConverter);
-        });
-    }
-
-    @Test
-    public void hasTestDagger() {
-        //TODO: make these real tests
-        forActivity(FakeActivity.class, testObject -> {
-            testObject.useService();
+            assertNotNull(testObject.forecastService);
+            assertThat(Dagger.get(), is(instanceOf(TestStormComponent.class)));
+            assertNotNull(testObject.forecastService.client);
+            assertSame(testObject.forecastService.client, client);
         });
     }
 }
