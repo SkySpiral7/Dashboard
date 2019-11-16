@@ -15,7 +15,7 @@ import androidx.test.core.app.ActivityScenario.ActivityAction;
 This is impossible to resolve in Android Studio 3.2 and shouldn't print out in 3.3+.
 */
 @RunWith(RobolectricTestRunner.class)
-@Config(sdk = Build.VERSION_CODES.M)
+@Config(sdk = Build.VERSION_CODES.N)
 public abstract class BaseRobolectricTest {
     protected <A extends Activity> void forActivity(Class<A> activityClass, ActivityAction<A> action) {
         try (ActivityScenario<A> scenario = ActivityScenario.launch(activityClass)) {

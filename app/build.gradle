@@ -4,7 +4,8 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.example.e449ps.stormy"
-        minSdkVersion 23
+        //lambdas are minSdkVersion 24
+        minSdkVersion 24
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
