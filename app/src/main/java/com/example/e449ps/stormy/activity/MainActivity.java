@@ -36,6 +36,7 @@ import androidx.databinding.DataBindingUtil;
 public class MainActivity extends AppCompatActivity {
     private ImageView iconImageView;
     // it's calling get() twice but really this whole thing should be in a ViewModel
+    //TODO: look into ViewModel
     private WeatherConverter weatherConverter = Dagger.get().weatherConverter();
     private ForecastService forecastService = Dagger.get().forecastService();
     private DisplayWeather displayWeather;

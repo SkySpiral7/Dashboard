@@ -19,7 +19,7 @@ import okhttp3.ResponseBody;
 
 @Reusable
 public class ForecastService {
-    private static final String TAG = ForecastService.class.getSimpleName();
+    private static final String TAG = ForecastService.class.getName();
     private static final String darkSkyBaseUrl = "https://api.darksky.net";
     private static final String apiKey = "61d409957e62d46af62a7a99618d5141";
 
@@ -47,6 +47,7 @@ public class ForecastService {
         Request request =
                 new Request.Builder().url(forecastUrl).addHeader("Accept", "application/json").build();
 
+        //TODO: add retro fit 2 and rx java
         client
                 .newCall(request)
                 .enqueue(
@@ -73,5 +74,14 @@ public class ForecastService {
                                 }
                             }
                         });
+    }
+
+    public void somethingSilly() {
+        String forecastUrl = darkSkyBaseUrl + "/forecast/" + apiKey + "/";
+        Request request =
+                new Request.Builder().url(forecastUrl).addHeader("Accept", "application/json").build();
+        client
+                .newCall(request)
+                .enqueue(null);
     }
 }

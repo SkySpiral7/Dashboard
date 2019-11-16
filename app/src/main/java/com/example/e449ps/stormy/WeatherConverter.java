@@ -21,7 +21,7 @@ import dagger.Reusable;
 
 @Reusable
 public class WeatherConverter {
-    private static final String TAG = WeatherConverter.class.getSimpleName();
+    private static final String TAG = WeatherConverter.class.getName();
     private Gson gson;
 
     @Inject

@@ -3,6 +3,9 @@ package com.example.e449ps.stormy.activity;
 import android.app.Activity;
 import android.os.Build;
 
+import com.example.e449ps.stormy.dagger.Dagger;
+
+import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;

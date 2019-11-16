@@ -14,10 +14,12 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.example.e449ps.stormy.ForecastService;
 import com.example.e449ps.stormy.R;
 import com.example.e449ps.stormy.WeatherConverter;
 import com.example.e449ps.stormy.dagger.Dagger;
 
+import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class FakeActivity extends AppCompatActivity {
@@ -27,6 +29,7 @@ public class FakeActivity extends AppCompatActivity {
     Spinner colorSpinner;
     Button launchActivityButton;
     WeatherConverter weatherConverter = Dagger.get().weatherConverter();
+    ForecastService forecastService = Dagger.get().forecastService();
     //TODO: figure out test dagger for Espresso and Robolectric
     //then: make tests for real classes and delete these
 
@@ -90,5 +93,11 @@ public class FakeActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    @VisibleForTesting
+    public void useService() {
+        //TODO: remove useService
+        forecastService.somethingSilly();
     }
 }
