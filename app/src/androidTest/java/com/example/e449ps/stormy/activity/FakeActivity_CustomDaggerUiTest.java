@@ -35,7 +35,7 @@ public class FakeActivity_CustomDaggerUiTest {
     @Rule
     public ActivityTestRule<FakeActivity> rule = new ActivityTestRule<>(FakeActivity.class);
 
-    public ForecastService forecastService = Dagger.get().forecastService();
+    private ForecastService forecastService = Dagger.get().forecastService();
 
     @Module
     public static class DoubleTestStormModule {

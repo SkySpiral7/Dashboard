@@ -9,7 +9,6 @@ import com.example.e449ps.stormy.BaseRobolectricTest;
 import com.example.e449ps.stormy.dagger.Dagger;
 import com.example.e449ps.stormy.dagger.TestStormComponent;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.robolectric.Shadows;
 
@@ -25,17 +24,6 @@ import static org.junit.Assert.assertTrue;
 
 public class FakeActivityUnitTest extends BaseRobolectricTest {
     private OkHttpClient client = Dagger.get().okHttpClient();
-
-    @BeforeClass
-    public static void setUpOnce() {
-        //note order: @BeforeClass, TestApplication, @Before
-        //dagger will not run over the test folder therefore custom daggers need to be in mockServices or implemented here
-        System.out.println();
-
-        //TODO: test overriding the service
-//        Dagger.set(DaggerTestStormComponent.create());
-//        Dagger.set(mock(StormComponent.class));
-    }
 
     @Test
     public void editTextUpdatesTextView() {

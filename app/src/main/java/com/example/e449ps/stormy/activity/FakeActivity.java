@@ -33,7 +33,7 @@ public class FakeActivity extends AppCompatActivity {
     //TODO: figure out test dagger for Espresso and Robolectric
     //then: make tests for real classes and delete these
 
-    public FakeActivity(){
+    public FakeActivity() {
         weatherConverter = Dagger.get().weatherConverter();
         forecastService = Dagger.get().forecastService();
     }
