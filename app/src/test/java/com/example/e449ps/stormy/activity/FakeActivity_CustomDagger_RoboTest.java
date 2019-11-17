@@ -17,7 +17,7 @@ import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-public class FakeActivity_CustomDaggerUnitTest extends BaseRobolectricTest {
+public class FakeActivity_CustomDagger_RoboTest extends BaseRobolectricTest {
     private ForecastService forecastService = Dagger.get().forecastService();
     private static StormComponent myStormComponent;
 

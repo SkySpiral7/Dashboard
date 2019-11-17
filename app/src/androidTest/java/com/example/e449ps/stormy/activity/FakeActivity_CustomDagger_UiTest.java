@@ -31,7 +31,7 @@ import static org.mockito.Mockito.mock;
  * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
  */
 @RunWith(JUnit4.class)
-public class FakeActivity_CustomDaggerUiTest {
+public class FakeActivity_CustomDagger_UiTest {
     @Rule
     public ActivityTestRule<FakeActivity> rule = new ActivityTestRule<>(FakeActivity.class);
 
@@ -54,7 +54,7 @@ public class FakeActivity_CustomDaggerUiTest {
     @BeforeClass
     public static void setUpOnce() {
         //note order: TestApplication, @BeforeClass, @Before
-        Dagger.set(DaggerFakeActivity_CustomDaggerUiTest_DoubleTestStormComponent.create());
+        Dagger.set(DaggerFakeActivity_CustomDagger_UiTest_DoubleTestStormComponent.create());
     }
 
     @AfterClass
@@ -68,7 +68,7 @@ public class FakeActivity_CustomDaggerUiTest {
         assertNotNull(testObject);
         assertNotNull(Dagger.get());
         assertNotNull(testObject.weatherConverter);
-        assertThat(Dagger.get(), is(instanceOf(DaggerFakeActivity_CustomDaggerUiTest_DoubleTestStormComponent.class)));
+        assertThat(Dagger.get(), is(instanceOf(DaggerFakeActivity_CustomDagger_UiTest_DoubleTestStormComponent.class)));
         assertNotNull(testObject.forecastService);
         assertSame(testObject.forecastService, forecastService);
     }

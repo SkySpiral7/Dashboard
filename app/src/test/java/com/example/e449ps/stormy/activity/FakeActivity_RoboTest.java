@@ -22,7 +22,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-public class FakeActivityUnitTest extends BaseRobolectricTest {
+public class FakeActivity_RoboTest extends BaseRobolectricTest {
     private OkHttpClient client = Dagger.get().okHttpClient();
 
     @Test

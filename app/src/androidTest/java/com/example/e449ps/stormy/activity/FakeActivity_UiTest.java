@@ -40,7 +40,7 @@ import static org.junit.Assert.assertThat;
  * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
  */
 @RunWith(JUnit4.class)
-public class FakeActivityUiTest {
+public class FakeActivity_UiTest {
     @Rule
     public ActivityTestRule<FakeActivity> rule = new ActivityTestRule<>(FakeActivity.class);
 
