@@ -15,6 +15,5 @@ public class TestApplication extends StormApplication {
         super.onCreate();
         //super.onCreate sets dagger to prod so set it back
         Dagger.set(originalComponent);
-        //TODO: what about running multiple Dagger tests? will it pollute? will need each test to clean up
     }
 }

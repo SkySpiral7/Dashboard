@@ -45,6 +45,7 @@ public class ForecastService {
             return;
         }
         String forecastUrl = darkSkyBaseUrl + "/forecast/" + apiKey + "/" + latitude + "," + longitude;
+        //TODO: what about using timber?
         Log.i(TAG, "GET " + forecastUrl);
         Request request =
                 new Request.Builder().url(forecastUrl).addHeader("Accept", "application/json").build();
@@ -76,15 +77,5 @@ public class ForecastService {
                                 }
                             }
                         });
-    }
-
-    @VisibleForTesting
-    public void somethingSilly() {
-        String forecastUrl = darkSkyBaseUrl + "/forecast/" + apiKey + "/";
-        Request request =
-                new Request.Builder().url(forecastUrl).addHeader("Accept", "application/json").build();
-        client
-                .newCall(request)
-                .enqueue(null);
     }
 }

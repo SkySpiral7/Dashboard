@@ -2,6 +2,7 @@ package com.example.e449ps.stormy.dagger;
 
 // See https://proandroiddev.com/dagger-2-on-android-the-simple-way-f706a2c597e9 for Dagger tips
 public final class Dagger {
+    //yes this is static state but this is easier than using Application
     private static StormComponent INSTANCE;
 
     private Dagger() {

@@ -7,6 +7,7 @@ import com.example.e449ps.stormy.dagger.DaggerTestStormComponent;
 import com.example.e449ps.stormy.dagger.StormComponent;
 
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.AdditionalAnswers;
@@ -18,7 +19,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 public class FakeActivity_CustomDagger_RoboTest extends BaseRobolectricTest {
-    private ForecastService forecastService = Dagger.get().forecastService();
+    private ForecastService forecastService;
     private static StormComponent myStormComponent;
 
     @BeforeClass
@@ -33,6 +34,11 @@ public class FakeActivity_CustomDagger_RoboTest extends BaseRobolectricTest {
     @AfterClass
     public static void tearDownOnce() {
         Dagger.set(DaggerTestStormComponent.create());
+    }
+
+    @Before
+    public void setUp() {
+        forecastService = Dagger.get().forecastService();
     }
 
     @Test

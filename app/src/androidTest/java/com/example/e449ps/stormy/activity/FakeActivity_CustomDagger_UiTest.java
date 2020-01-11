@@ -7,6 +7,7 @@ import com.example.e449ps.stormy.dagger.StormComponent;
 import com.example.e449ps.stormy.dagger.TestStormModule;
 
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,7 +36,7 @@ public class FakeActivity_CustomDagger_UiTest {
     @Rule
     public ActivityTestRule<FakeActivity> rule = new ActivityTestRule<>(FakeActivity.class);
 
-    private ForecastService forecastService = Dagger.get().forecastService();
+    private ForecastService forecastService;
 
     @Module
     public static class DoubleTestStormModule {
@@ -60,6 +61,11 @@ public class FakeActivity_CustomDagger_UiTest {
     @AfterClass
     public static void tearDownOnce() {
         Dagger.set(DaggerTestStormComponent.create());
+    }
+
+    @Before
+    public void setUp() {
+        forecastService = Dagger.get().forecastService();
     }
 
     @Test

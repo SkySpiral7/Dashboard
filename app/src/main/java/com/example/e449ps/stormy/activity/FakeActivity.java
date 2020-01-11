@@ -19,9 +19,9 @@ import com.example.e449ps.stormy.R;
 import com.example.e449ps.stormy.WeatherConverter;
 import com.example.e449ps.stormy.dagger.Dagger;
 
-import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 
+//it's useful for the tests for this class to run without lambdas so that it could run on API 23
 public class FakeActivity extends AppCompatActivity {
     LinearLayout linearLayout;
     EditText editText;
@@ -98,11 +98,5 @@ public class FakeActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-    }
-
-    @VisibleForTesting
-    public void useService() {
-        //TODO: remove useService
-        forecastService.somethingSilly();
     }
 }
