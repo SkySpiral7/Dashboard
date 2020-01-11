@@ -10,10 +10,6 @@ import org.robolectric.annotation.Config;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ActivityScenario.ActivityAction;
 
-/*
-[Robolectric] NOTICE: legacy resources mode is deprecated
-This is impossible to resolve in Android Studio 3.2 and shouldn't print out in 3.3+.
-*/
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = Build.VERSION_CODES.N)
 public abstract class BaseRobolectricTest {
