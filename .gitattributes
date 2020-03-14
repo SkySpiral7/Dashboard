@@ -13,6 +13,9 @@
 #These text files must have Windows line endings.
 *.bat text eol=crlf
 
+#These text files must have Unix line endings.
+gradlew text eol=lf
+
 #These files are binary and should be left untouched to prevent corruption.
 *.jar binary
 *.png binary
