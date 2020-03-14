@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView iconImageView;
     // it's calling get() twice but really this whole thing should be in a ViewModel
     //TODO: look into ViewModel
+    //TODO: make tests for real classes (see example branch)
     private WeatherConverter weatherConverter = Dagger.get().weatherConverter();
     private ForecastService forecastService = Dagger.get().forecastService();
     private DisplayWeather displayWeather;

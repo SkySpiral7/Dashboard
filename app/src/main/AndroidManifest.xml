@@ -33,7 +33,5 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.e449ps.stormy.activity.MainActivity" />
         </activity>
-        <activity android:name=".activity.FakeActivity" />
-        <activity android:name=".activity.OtherActivity" />
     </application>
 </manifest>
