@@ -7,7 +7,6 @@ import com.example.e449ps.stormy.model.DisplayWeather;
 import com.example.e449ps.stormy.model.HourlyWeather;
 import com.example.e449ps.stormy.model.darkSky.DataPoint;
 import com.example.e449ps.stormy.model.darkSky.Forecast;
-import com.google.gson.Gson;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,15 +21,12 @@ import dagger.Reusable;
 @Reusable
 public class WeatherConverter {
     private static final String TAG = WeatherConverter.class.getName();
-    private Gson gson;
 
     @Inject
-    public WeatherConverter(Gson gson) {
-        this.gson = gson;
+    public WeatherConverter() {
     }
 
-    public DisplayWeather getCurrentDetails(String json) {
-        Forecast forecast = gson.fromJson(json, Forecast.class);
+    public DisplayWeather getCurrentDetails(Forecast forecast) {
         TimeZone timeZone = TimeZone.getTimeZone(forecast.getTimezone());
 
         DataPoint currently = forecast.getCurrently();

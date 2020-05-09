@@ -24,6 +24,7 @@ import com.example.e449ps.stormy.dialog.GeneralErrorDialogFragment;
 import com.example.e449ps.stormy.dialog.InternetErrorDialogFragment;
 import com.example.e449ps.stormy.model.DisplayWeather;
 import com.example.e449ps.stormy.model.HourlyWeather;
+import com.example.e449ps.stormy.model.darkSky.Forecast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,15 +36,17 @@ import androidx.databinding.DataBindingUtil;
 
 public class MainActivity extends AppCompatActivity {
     private ImageView iconImageView;
+    private ActivityMainBinding binding;
+//    private ViewModelProvider.Factory vmFactory = Dagger.get().injectionViewModelFactory();
+
     // it's calling get() twice but really this whole thing should be in a ViewModel
-    //TODO: look into ViewModel
+    //TODO: look into ViewModel. find something (mitch didn't help) or maybe I already know it
     //TODO: make tests for real classes (see example branch)
     private WeatherConverter weatherConverter = Dagger.get().weatherConverter();
     private ForecastService forecastService = Dagger.get().forecastService();
     private DisplayWeather displayWeather;
     private LocationFacade locationFacade;
     private Location lastKnownLocation;
-    private ActivityMainBinding binding;
     private boolean inInitialState;
 
     @Override
@@ -131,10 +134,10 @@ public class MainActivity extends AppCompatActivity {
     private void getForecast(final ActivityMainBinding binding, double latitude, double longitude) {
         forecastService.getForecast(
                 this,
-                new ForecastService.StringConsumer() {
+                new ForecastService.ForecastConsumer() {
                     @Override
-                    public void accept(String responseBodyString) {
-                        displayWeather = weatherConverter.getCurrentDetails(responseBodyString);
+                    public void accept(Forecast forecast) {
+                        displayWeather = weatherConverter.getCurrentDetails(forecast);
                         binding.setWeather(displayWeather.getCurrentWeather());
                         runOnUiThread(
                                 new Runnable() {

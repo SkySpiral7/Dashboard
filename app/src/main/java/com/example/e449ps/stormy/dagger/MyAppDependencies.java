@@ -7,4 +7,6 @@ public interface MyAppDependencies {
     WeatherConverter weatherConverter();
 
     ForecastService forecastService();
+
+//    InjectionViewModelFactory injectionViewModelFactory();
 }
