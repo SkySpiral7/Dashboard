@@ -1,6 +1,7 @@
 package com.example.e449ps.stormy.dagger;
 
 import com.example.e449ps.stormy.ForecastRetrofitCaller;
+import com.example.e449ps.stormy.MyLoggingInterceptor;
 import com.google.gson.Gson;
 
 import javax.inject.Singleton;
@@ -9,6 +10,7 @@ import dagger.Module;
 import dagger.Provides;
 import dagger.Reusable;
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -23,16 +25,22 @@ public class StormModule {
     @Provides
     @Singleton
     public static OkHttpClient okHttpClient() {
-        return new OkHttpClient();
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.level(HttpLoggingInterceptor.Level.BODY);
+
+        OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder();
+        httpClientBuilder.addInterceptor(interceptor);
+        return httpClientBuilder.build();
     }
 
     @Provides
     @Singleton
-    public static Retrofit retrofit() {
+    public static Retrofit retrofit(OkHttpClient okHttpClient, Gson gson) {
         return new Retrofit.Builder()
-                //TODO: test empty string and http (so says it won't work)
+                //base URL is required (null and "" fail)
                 .baseUrl("http://localhost/")
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .client(okHttpClient)
                 .build();
     }
 

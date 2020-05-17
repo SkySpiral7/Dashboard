@@ -30,12 +30,12 @@ public class ForecastService {
             caller.showInternetErrorDialog();
             return;
         }
-        //TODO: what about using timber?
+        //TODO: what about using timber? currently the HTTP log is D/OkHttp to console (not logcat)
         //https://caster.io/courses/timber-logging-library
-        Log.i(TAG, "GET <forecast>");
-        //TODO: needs better logging. I got rid of okResponseConverter for example
+        //if timber doesn't do specific logs then see https://stackoverflow.com/questions/2018263/how-do-i-enable-disable-log-levels-in-android/2019563#2019563
+        //check if HttpLoggingInterceptor support timber
 
-        //TODO: add retro fit 2 and rx java
+        //TODO: add rx java
         //? https://codingwithmitch.com/blog/android-retrofit2-getting-started/
         //https://codingwithmitch.com/courses/rest-api-mvvm-retrofit2/
         //https://codingwithmitch.com/courses/rxjava-rxandroid-for-beginners/
