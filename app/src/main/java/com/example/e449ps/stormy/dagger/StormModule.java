@@ -4,6 +4,7 @@ import com.example.e449ps.stormy.ForecastRetrofitCaller;
 import com.example.e449ps.stormy.MyLoggingInterceptor;
 import com.google.gson.Gson;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -15,10 +16,19 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 @Module
 public class StormModule {
+    private static final String DARK_SKY_RETROFIT_NAME = "Dark Sky retrofit";
+    private static final String DARK_SKY_API_KEY = "61d409957e62d46af62a7a99618d5141";
+
     @Provides
     @Reusable
     public static Gson gson() {
         return new Gson();
+    }
+
+    @Provides
+    @Reusable
+    public static GsonConverterFactory gsonConverterFactory(Gson gson) {
+        return GsonConverterFactory.create(gson);
     }
 
     @Provides
@@ -30,19 +40,19 @@ public class StormModule {
     }
 
     @Provides
-    @Singleton
-    public static Retrofit retrofit(OkHttpClient okHttpClient, Gson gson) {
+    @Reusable
+    @Named(DARK_SKY_RETROFIT_NAME)
+    public static Retrofit retrofit(OkHttpClient okHttpClient, GsonConverterFactory gsonConverterFactory) {
         return new Retrofit.Builder()
-                //base URL is required (null and "" fail)
-                .baseUrl("http://localhost/")
-                .addConverterFactory(GsonConverterFactory.create(gson))
+                .baseUrl("https://api.darksky.net/forecast/" + DARK_SKY_API_KEY + "/")
+                .addConverterFactory(gsonConverterFactory)
                 .client(okHttpClient)
                 .build();
     }
 
     @Provides
-    @Singleton
-    public static ForecastRetrofitCaller forecastRetrofitCaller(Retrofit retrofit) {
+    @Reusable
+    public static ForecastRetrofitCaller forecastRetrofitCaller(@Named(DARK_SKY_RETROFIT_NAME) Retrofit retrofit) {
         return retrofit.create(ForecastRetrofitCaller.class);
     }
 }

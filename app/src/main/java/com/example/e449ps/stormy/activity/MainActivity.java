@@ -24,7 +24,6 @@ import com.example.e449ps.stormy.dialog.GeneralErrorDialogFragment;
 import com.example.e449ps.stormy.dialog.InternetErrorDialogFragment;
 import com.example.e449ps.stormy.model.DisplayWeather;
 import com.example.e449ps.stormy.model.HourlyWeather;
-import com.example.e449ps.stormy.model.darkSky.Forecast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -134,20 +133,12 @@ public class MainActivity extends AppCompatActivity {
     private void getForecast(final ActivityMainBinding binding, double latitude, double longitude) {
         forecastService.getForecast(
                 this,
-                new ForecastService.ForecastConsumer() {
-                    @Override
-                    public void accept(Forecast forecast) {
-                        displayWeather = weatherConverter.getCurrentDetails(forecast);
-                        binding.setWeather(displayWeather.getCurrentWeather());
-                        runOnUiThread(
-                                new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        iconImageView.setImageDrawable(
-                                                getDrawable(displayWeather.getCurrentWeather().getIconId()));
-                                    }
-                                });
-                    }
+                forecast -> {
+                    displayWeather = weatherConverter.getCurrentDetails(forecast);
+                    binding.setWeather(displayWeather.getCurrentWeather());
+                    runOnUiThread(
+                            () -> iconImageView.setImageDrawable(
+                                    getDrawable(displayWeather.getCurrentWeather().getIconId())));
                 },
                 latitude,
                 longitude);
