@@ -10,7 +10,6 @@ import dagger.Module;
 import dagger.Provides;
 import dagger.Reusable;
 import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -24,10 +23,7 @@ public class StormModule {
 
     @Provides
     @Singleton
-    public static OkHttpClient okHttpClient() {
-        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.level(HttpLoggingInterceptor.Level.BODY);
-
+    public static OkHttpClient okHttpClient(MyLoggingInterceptor interceptor) {
         OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder();
         httpClientBuilder.addInterceptor(interceptor);
         return httpClientBuilder.build();

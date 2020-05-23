@@ -1,7 +1,5 @@
 package com.example.e449ps.stormy;
 
-import android.util.Log;
-
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -18,12 +16,16 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import okio.Buffer;
 import okio.BufferedSource;
+import timber.log.Timber;
 
-//Might be needed for timber. it's nice that the body is lower level but not worth body being cut off
+/**
+ * needed for timber. it's nice that the body is lower level and Timber won't cut off the body
+ *
+ * @see okhttp3.logging.HttpLoggingInterceptor
+ */
+//TODO: do I need to handle all the things HttpLoggingInterceptor does?
 @Reusable
 public class MyLoggingInterceptor implements Interceptor {
-    private static final String TAG = MyLoggingInterceptor.class.getName();
-
     @Inject
     public MyLoggingInterceptor() {
     }
@@ -33,10 +35,10 @@ public class MyLoggingInterceptor implements Interceptor {
     public Response intercept(Chain chain) throws IOException {
         Request request = chain.request();
 
-        Log.i(TAG, String.format("--> %s %s%n%s", request.method(), request.url(), request.headers()));
+        Timber.i("--> %s %s%n%s", request.method(), request.url(), request.headers());
         String requestBody = requestBodyToString(request);
-        if (requestBody == null) Log.d(TAG, "No request body");
-        else Log.v(TAG, String.format("Request body (%d):%n%s", requestBody.length(), requestBody));
+        if (requestBody == null) Timber.d("No request body");
+        else Timber.v("Request body (%d):%n%s", requestBody.length(), requestBody);
 
         long start = System.nanoTime();
         Response response = chain.proceed(request);
@@ -55,10 +57,10 @@ public class MyLoggingInterceptor implements Interceptor {
             newResponseBuilder.body(ResponseBody.create(responseBody.source(), responseBody.contentType(), responseBody.contentLength()));
         }
 
-        Log.i(TAG, String.format("<-- %d %s (%dms)%n%s", response.code(), response.request().url(), duration, response.headers()));
-        if (responseBodyString == null) Log.d(TAG, "No response body");
+        Timber.i("<-- %d %s (%dms)%n%s", response.code(), response.request().url(), duration, response.headers());
+        if (responseBodyString == null) Timber.d("No response body");
         else
-            Log.v(TAG, String.format("Response body (%d):%n%s", responseBodyString.length(), responseBodyString));
+            Timber.v("Response body (%d):%n%s", responseBodyString.length(), responseBodyString);
 
         return newResponseBuilder.build();
     }
@@ -76,9 +78,8 @@ public class MyLoggingInterceptor implements Interceptor {
     }
 
     private String responseBodyToString(final ResponseBody responseBody) throws IOException {
-        //TODO: can't get the entire body for some reason
         BufferedSource source = responseBody.source();
-        source.request(Long.MAX_VALUE);  //should but doesn't buffer entire body
+        source.request(Long.MAX_VALUE);  //buffer entire body. don't use contentLength which may be -1
         Charset charset = responseBody.contentType() == null ? StandardCharsets.UTF_8 : responseBody.contentType().charset(StandardCharsets.UTF_8);
         return source.getBuffer().clone().readString(charset);
     }

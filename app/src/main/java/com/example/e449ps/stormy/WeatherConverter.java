@@ -1,7 +1,5 @@
 package com.example.e449ps.stormy;
 
-import android.util.Log;
-
 import com.example.e449ps.stormy.model.CurrentWeather;
 import com.example.e449ps.stormy.model.DisplayWeather;
 import com.example.e449ps.stormy.model.HourlyWeather;
@@ -17,11 +15,10 @@ import java.util.TimeZone;
 import javax.inject.Inject;
 
 import dagger.Reusable;
+import timber.log.Timber;
 
 @Reusable
 public class WeatherConverter {
-    private static final String TAG = WeatherConverter.class.getName();
-
     @Inject
     public WeatherConverter() {
     }
@@ -105,7 +102,7 @@ public class WeatherConverter {
             default:
                 // "Developers should ensure that a sensible default is defined, as additional values, such
                 // as hail, thunderstorm, or tornado, may be defined in the future."
-                Log.w(TAG, "Unexpected weather type: " + iconString);
+                Timber.w("Unexpected weather type: %s", iconString);
                 iconId = R.drawable.clear_day;
         }
         return iconId;

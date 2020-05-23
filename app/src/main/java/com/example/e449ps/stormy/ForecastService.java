@@ -1,18 +1,15 @@
 package com.example.e449ps.stormy;
 
-import android.util.Log;
-
 import com.example.e449ps.stormy.activity.MainActivity;
 import com.example.e449ps.stormy.model.darkSky.Forecast;
 
 import javax.inject.Inject;
 
 import dagger.Reusable;
+import timber.log.Timber;
 
 @Reusable
 public class ForecastService {
-    private static final String TAG = ForecastService.class.getName();
-
     private ForecastRetrofitCaller forecastRetrofitCaller;
 
     @Inject
@@ -30,11 +27,6 @@ public class ForecastService {
             caller.showInternetErrorDialog();
             return;
         }
-        //TODO: what about using timber? currently the HTTP log is D/OkHttp to console (not logcat)
-        //https://caster.io/courses/timber-logging-library
-        //if timber doesn't do specific logs then see https://stackoverflow.com/questions/2018263/how-do-i-enable-disable-log-levels-in-android/2019563#2019563
-        //check if HttpLoggingInterceptor support timber
-
         //TODO: add rx java
         //? https://codingwithmitch.com/blog/android-retrofit2-getting-started/
         //https://codingwithmitch.com/courses/rest-api-mvvm-retrofit2/
@@ -50,7 +42,7 @@ public class ForecastService {
 
             @Override
             public void onFailure(retrofit2.Call<Forecast> call, Throwable t) {
-                Log.e(TAG, "internet call failed", t);
+                Timber.e(t, "internet call failed");
                 caller.alertUserAboutError();
             }
         });

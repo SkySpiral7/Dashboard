@@ -9,7 +9,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.example.e449ps.stormy"
-        //lambdas are minSdkVersion 24
+        //lambdas are minSdkVersion 24 also no tag length limit
         minSdkVersion 24
         targetSdkVersion 28
         versionCode 1
@@ -52,6 +52,7 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:4.1.1"
     implementation 'com.squareup.okhttp3:logging-interceptor:4.1.1'
     implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.jakewharton.timber:timber:4.7.1'
 
     testImplementation 'junit:junit:4.12'
 
