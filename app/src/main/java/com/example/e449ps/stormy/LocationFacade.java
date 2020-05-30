@@ -57,6 +57,10 @@ public class LocationFacade {
     private FusedLocationProviderClient fusedLocationProviderClient;
     private Runnable permissionDeniedCallback;
 
+    /**
+     * @param justificationFactory to avoid asking twice this needs to generate a single button dialogue.
+     *                             the android native prompt that follows handles declining
+     */
     public LocationFacade(
             Activity activity,
             Consumer<DialogInterface.OnClickListener> justificationFactory,
@@ -90,7 +94,7 @@ public class LocationFacade {
     }
 
     public void onRequestPermissionsResult(
-            final int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+            final int requestCode, @NonNull String[] requestedPermissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_LOCATION_PERMISSION_CODE) {
             // If request is cancelled, the result arrays are empty.
             // the array will be length 0 or 1 since I only asked for FINE_LOCATION
@@ -141,7 +145,7 @@ public class LocationFacade {
             if (ActivityCompat.shouldShowRequestPermissionRationale(
                     activity, Manifest.permission.ACCESS_FINE_LOCATION)) {
                 justificationFactory.accept(
-                        (dialogInterface, i) -> {
+                        (dialog, whichButton) -> {
                             // Prompt the user once explanation has been shown
                             ActivityCompat.requestPermissions(
                                     activity,

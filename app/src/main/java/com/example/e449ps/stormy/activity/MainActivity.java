@@ -40,11 +40,16 @@ public class MainActivity extends AppCompatActivity {
 
     // it's calling get() twice but really this whole thing should be in a ViewModel
     //TODO: look into ViewModel. find something (mitch didn't help) or maybe I already know it
+    //think I need rx to do vm. I know enough vm to listen to mitch about rx
+    //? vm inject: https://www.youtube.com/watch?v=6eOyCEkQ5zQ
     //TODO: make tests for real classes (see example branch)
     private WeatherConverter weatherConverter = Dagger.get().weatherConverter();
     private ForecastService forecastService = Dagger.get().forecastService();
     private DisplayWeather displayWeather;
     private LocationFacade locationFacade;
+    /**
+     * Only used for debugging
+     */
     private Location lastKnownLocation;
     private boolean inInitialState;
 
@@ -62,9 +67,8 @@ public class MainActivity extends AppCompatActivity {
         displayWeather = null;
         lastKnownLocation = null;
         inInitialState = true;
-        locationFacade =
-                new LocationFacade(this, this::locationRationalDialog, this::locationCallback, () -> {
-                });
+        Runnable permissionDeniedCallback = () -> Toast.makeText(this, "Denied: Can't load weather", Toast.LENGTH_SHORT).show();
+        locationFacade = new LocationFacade(this, this::locationRationalDialog, this::locationCallback, permissionDeniedCallback);
     }
 
     @Override
@@ -72,8 +76,8 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         locationFacade.connect();
         if (inInitialState) {
-            // use boolean instead of lastKnownLocation==null to avoid this happening more than once in a
-            // row
+            /*use boolean instead of lastKnownLocation==null to avoid this happening more than once in a
+            row. the reason this isn't in onCreate is so that it's after connect*/
             inInitialState = false;
             Toast.makeText(this, "Loading", Toast.LENGTH_SHORT).show();
             locationFacade.askForLocation();
@@ -88,9 +92,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(
-            int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        locationFacade.onRequestPermissionsResult(requestCode, permissions, grantResults);
+            int requestCode, @NonNull String[] requestedPermissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, requestedPermissions, grantResults);
+        locationFacade.onRequestPermissionsResult(requestCode, requestedPermissions, grantResults);
     }
 
     public void refreshOnClick(View unused) {
@@ -98,16 +102,17 @@ public class MainActivity extends AppCompatActivity {
         locationFacade.askForLocation();
     }
 
-    private void locationRationalDialog(DialogInterface.OnClickListener listener) {
+    public void locationRationalDialog(DialogInterface.OnClickListener listener) {
         new AlertDialog.Builder(this)
                 .setTitle(R.string.title_location_permission)
                 .setMessage(R.string.text_location_permission)
-                .setPositiveButton(R.string.ok_text, listener)
+                .setPositiveButton(R.string.open_permission_button, listener)
+                .setCancelable(false)
                 .create()
                 .show();
     }
 
-    private void locationCallback(Location newLocation) {
+    public void locationCallback(Location newLocation) {
         lastKnownLocation = newLocation;
         getForecast(binding, lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
     }
