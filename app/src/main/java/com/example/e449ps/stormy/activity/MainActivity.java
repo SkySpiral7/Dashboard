@@ -14,9 +14,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.e449ps.stormy.ForecastService;
+import com.example.e449ps.stormy.ForecastRetrofitCaller;
 import com.example.e449ps.stormy.LocationFacade;
 import com.example.e449ps.stormy.R;
+import com.example.e449ps.stormy.SchedulerFacade;
 import com.example.e449ps.stormy.WeatherConverter;
 import com.example.e449ps.stormy.dagger.Dagger;
 import com.example.e449ps.stormy.databinding.ActivityMainBinding;
@@ -24,6 +25,7 @@ import com.example.e449ps.stormy.dialog.GeneralErrorDialogFragment;
 import com.example.e449ps.stormy.dialog.InternetErrorDialogFragment;
 import com.example.e449ps.stormy.model.DisplayWeather;
 import com.example.e449ps.stormy.model.HourlyWeather;
+import com.example.e449ps.stormy.model.darkSky.Forecast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +34,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
+import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
+import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity {
     private ImageView iconImageView;
@@ -44,7 +49,8 @@ public class MainActivity extends AppCompatActivity {
     //? vm inject: https://www.youtube.com/watch?v=6eOyCEkQ5zQ
     //TODO: make tests for real classes (see example branch)
     private WeatherConverter weatherConverter = Dagger.get().weatherConverter();
-    private ForecastService forecastService = Dagger.get().forecastService();
+    private ForecastRetrofitCaller forecastRetrofitCaller = Dagger.get().forecastRetrofitCaller();
+    private SchedulerFacade schedulerFacade = Dagger.get().schedulerFacade();
     private DisplayWeather displayWeather;
     private LocationFacade locationFacade;
     /**
@@ -52,6 +58,9 @@ public class MainActivity extends AppCompatActivity {
      */
     private Location lastKnownLocation;
     private boolean inInitialState;
+    private Disposable networkDisposable;
+    private Disposable locationDisposable;
+    private Observable<Location> locationObservable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         lastKnownLocation = null;
         inInitialState = true;
         Runnable permissionDeniedCallback = () -> Toast.makeText(this, "Denied: Can't load weather", Toast.LENGTH_SHORT).show();
-        locationFacade = new LocationFacade(this, this::locationRationalDialog, this::locationCallback, permissionDeniedCallback);
+        locationFacade = new LocationFacade(this, this::locationRationalDialog, this::takeLocation, permissionDeniedCallback);
     }
 
     @Override
@@ -80,7 +89,17 @@ public class MainActivity extends AppCompatActivity {
             row. the reason this isn't in onCreate is so that it's after connect*/
             inInitialState = false;
             Toast.makeText(this, "Loading", Toast.LENGTH_SHORT).show();
-            locationFacade.askForLocation();
+
+            //this is coded funny to avoid a race condition since askForLocation changes hasLocationPermission
+            if (locationFacade.hasLocationPermission()) {
+                locationObservable = schedulerFacade.ioToBackground(locationFacade.askForLocation());
+                //if already have permission then permission accepted callback won't be called so manually call takeLocation
+                takeLocation();
+            } else {
+                locationObservable = schedulerFacade.ioToBackground(locationFacade.askForLocation());
+                /*takeLocation will be called in the permission accepted callback.
+                can't do it here because no permission yet*/
+            }
         }
     }
 
@@ -88,6 +107,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         locationFacade.disconnect();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //these need to be disposed if success wasn't yet called
+        if (networkDisposable != null) networkDisposable.dispose();
+        if (locationDisposable != null) locationDisposable.dispose();
     }
 
     @Override
@@ -99,7 +126,15 @@ public class MainActivity extends AppCompatActivity {
 
     public void refreshOnClick(View unused) {
         Toast.makeText(MainActivity.this, "Refreshing", Toast.LENGTH_SHORT).show();
-        locationFacade.askForLocation();
+        /*ask for permission again if the initial was denied. this will then call permission accepted callback
+        which is takeLocation. else take a new location.*/
+        if (!locationFacade.hasLocationPermission())
+            locationObservable = schedulerFacade.ioToBackground(locationFacade.askForLocation());
+        else takeLocation();
+    }
+
+    private void takeLocation() {
+        locationDisposable = locationObservable.take(1).subscribe(this::locationCallback);
     }
 
     public void locationRationalDialog(DialogInterface.OnClickListener listener) {
@@ -115,12 +150,13 @@ public class MainActivity extends AppCompatActivity {
     public void locationCallback(Location newLocation) {
         lastKnownLocation = newLocation;
         getForecast(binding, lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
+        locationDisposable.dispose();
     }
 
     /**
-     * @return true if !airplaneMode && (Wi-Fi || cell data)
+     * @return true if {@code !airplaneMode && (Wi-Fi || cell data)}
      */
-    public boolean isConnectedToInternet() {
+    private boolean isConnectedToInternet() {
         ConnectivityManager manager =
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = manager.getActiveNetworkInfo();
@@ -136,25 +172,36 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getForecast(final ActivityMainBinding binding, double latitude, double longitude) {
-        forecastService.getForecast(
-                this,
-                forecast -> {
-                    displayWeather = weatherConverter.getCurrentDetails(forecast);
-                    binding.setWeather(displayWeather.getCurrentWeather());
-                    runOnUiThread(
-                            () -> iconImageView.setImageDrawable(
-                                    getDrawable(displayWeather.getCurrentWeather().getIconId())));
-                },
-                latitude,
-                longitude);
+        if (!this.isConnectedToInternet()) {
+            this.showInternetErrorDialog();
+            return;
+        }
+        //TODO: can network be Observable?
+        //TODO: can these be composed into 1 Observable instead of 2?
+
+        networkDisposable = schedulerFacade.ioToUi(forecastRetrofitCaller.getForecast(latitude, longitude))
+                .subscribe(this::onSuccess, this::onError);
     }
 
-    public void alertUserAboutError() {
+    private void onError(Throwable throwable) {
+        Timber.e(throwable, "internet call failed");
+        this.alertUserAboutError();
+        networkDisposable.dispose();
+    }
+
+    private void onSuccess(Forecast forecast) {
+        displayWeather = weatherConverter.getCurrentDetails(forecast);
+        binding.setWeather(displayWeather.getCurrentWeather());
+        iconImageView.setImageDrawable(getDrawable(displayWeather.getCurrentWeather().getIconId()));
+        networkDisposable.dispose();
+    }
+
+    private void alertUserAboutError() {
         GeneralErrorDialogFragment dialog = new GeneralErrorDialogFragment();
         dialog.show(getFragmentManager(), "error_dialogue");
     }
 
-    public void showInternetErrorDialog() {
+    private void showInternetErrorDialog() {
         new InternetErrorDialogFragment().show(getFragmentManager(), "network_error_dialogue");
     }
 }

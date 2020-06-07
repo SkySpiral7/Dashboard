@@ -13,13 +13,13 @@ import android.provider.Settings;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.function.Consumer;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import io.reactivex.Observable;
 
 /**
  * Boilerplate:
@@ -50,11 +50,12 @@ public class LocationFacade {
     private static final short REQUEST_LOCATION_PERMISSION_CODE = 2878;
 
     private final Activity activity;
-    private final OnSuccessListener<Location> locationCallback;
     private final Consumer<DialogInterface.OnClickListener> justificationFactory;
 
     private GoogleApiClient googleApiClient;
+    //TODO: consider a single interface with all these callbacks
     private FusedLocationProviderClient fusedLocationProviderClient;
+    private Runnable permissionApprovedCallback;
     private Runnable permissionDeniedCallback;
 
     /**
@@ -64,18 +65,11 @@ public class LocationFacade {
     public LocationFacade(
             Activity activity,
             Consumer<DialogInterface.OnClickListener> justificationFactory,
-            OnSuccessListener<Location> locationCallback,
+            Runnable permissionApprovedCallback,
             Runnable permissionDeniedCallback) {
         this.activity = activity;
         this.justificationFactory = justificationFactory;
-        this.locationCallback =
-                (Location it) -> {
-                    // null means that it successfully contacted a disabled service...
-                    // ignore this so that your callback only gets successful locations
-                    // TODO: is null a single place to check if location is on?
-                    // not sure if !airplane && isLocationEnabled is enough: does GPS work with internet off?
-                    if (it != null) locationCallback.onSuccess(it);
-                };
+        this.permissionApprovedCallback = permissionApprovedCallback;
         this.permissionDeniedCallback = permissionDeniedCallback;
 
         googleApiClient = new GoogleApiClient.Builder(activity).addApi(LocationServices.API).build();
@@ -101,7 +95,7 @@ public class LocationFacade {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // I don't think I need to check hasLocationPermission because I already checked the array
                 // for "granted"
-                lastLocationCallback();
+                permissionApprovedCallback.run();
             } else {
                 permissionDeniedCallback.run();
             }
@@ -113,6 +107,7 @@ public class LocationFacade {
                 == PackageManager.PERMISSION_GRANTED;
     }
 
+    //TODO: move these and Main's isConnectedToInternet to an Internet helper
     public boolean isLocationEnabled() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             // This is a new method provided in API 28
@@ -138,9 +133,11 @@ public class LocationFacade {
     }
 
     /**
-     * Will send attempt to send a location to the provided locationCallback. Will not send null.
+     * Will ask for location permission as needed.
+     *
+     * @return will never complete or error
      */
-    public void askForLocation() {
+    public Observable<Location> askForLocation() {
         if (!hasLocationPermission()) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(
                     activity, Manifest.permission.ACCESS_FINE_LOCATION)) {
@@ -158,13 +155,18 @@ public class LocationFacade {
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         REQUEST_LOCATION_PERMISSION_CODE);
             }
-        } else {
-            lastLocationCallback();
         }
-    }
 
-    private void lastLocationCallback() throws SecurityException {
-        fusedLocationProviderClient.getLastLocation().addOnSuccessListener(activity, locationCallback);
-        // onFailure doesn't seem to be called
+        return Observable.create(emitter -> {
+            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(activity, it -> {
+                        // null means that it successfully contacted a disabled service...
+                        // ignore this so that your callback only gets successful locations
+                        // TODO: is null a single place to check if location is on?
+                        // not sure if !airplane && isLocationEnabled is enough: does GPS work with internet off?
+                        if (!emitter.isDisposed() && it != null) emitter.onNext(it);
+                    }
+            );
+            // onFailure is only called if it lacks permission
+        });
     }
 }

@@ -12,6 +12,7 @@ import dagger.Provides;
 import dagger.Reusable;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 @Module
@@ -32,6 +33,12 @@ public class StormModule {
     }
 
     @Provides
+    @Reusable
+    public static RxJava2CallAdapterFactory rxJava2CallAdapterFactory() {
+        return RxJava2CallAdapterFactory.create();
+    }
+
+    @Provides
     @Singleton
     public static OkHttpClient okHttpClient(MyLoggingInterceptor interceptor) {
         OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder();
@@ -42,9 +49,11 @@ public class StormModule {
     @Provides
     @Reusable
     @Named(DARK_SKY_RETROFIT_NAME)
-    public static Retrofit retrofit(OkHttpClient okHttpClient, GsonConverterFactory gsonConverterFactory) {
+    public static Retrofit retrofit(OkHttpClient okHttpClient, GsonConverterFactory gsonConverterFactory,
+                                    RxJava2CallAdapterFactory rxJava2CallAdapterFactory) {
         return new Retrofit.Builder()
                 .baseUrl("https://api.darksky.net/forecast/" + DARK_SKY_API_KEY + "/")
+                .addCallAdapterFactory(rxJava2CallAdapterFactory)
                 .addConverterFactory(gsonConverterFactory)
                 .client(okHttpClient)
                 .build();
