@@ -18,6 +18,7 @@ import com.example.e449ps.stormy.R;
 import com.example.e449ps.stormy.SchedulerFacade;
 import com.example.e449ps.stormy.WeatherConverter;
 import com.example.e449ps.stormy.dagger.Dagger;
+import com.example.e449ps.stormy.dagger.StormComponent;
 import com.example.e449ps.stormy.databinding.ActivityMainBinding;
 import com.example.e449ps.stormy.dialog.GeneralErrorDialogFragment;
 import com.example.e449ps.stormy.dialog.InternetErrorDialogFragment;
@@ -46,10 +47,10 @@ public class MainActivity extends AppCompatActivity {
     //think I need rx to do vm. I know enough vm to listen to mitch about rx
     //? vm inject: https://www.youtube.com/watch?v=6eOyCEkQ5zQ
     //TODO: make tests for real classes (see example branch)
-    private WeatherConverter weatherConverter = Dagger.get().weatherConverter();
-    private ForecastRetrofitCaller forecastRetrofitCaller = Dagger.get().forecastRetrofitCaller();
-    private SchedulerFacade schedulerFacade = Dagger.get().schedulerFacade();
-    private ConnectionFacade connectionFacade = Dagger.get().connectionFacade();
+    private WeatherConverter weatherConverter;
+    private ForecastRetrofitCaller forecastRetrofitCaller;
+    private SchedulerFacade schedulerFacade;
+    private ConnectionFacade connectionFacade;
     private DisplayWeather displayWeather;
     private LocationFacade locationFacade;
     /**
@@ -62,6 +63,14 @@ public class MainActivity extends AppCompatActivity {
     private Observable<Location> locationObservable;
     private WeatherCallbacks weatherCallbacks = new WeatherCallbacks();
     private LocationCallbacks locationCallbacks = new LocationCallbacks();
+
+    public MainActivity() {
+        StormComponent dagger = Dagger.get();
+        weatherConverter = dagger.weatherConverter();
+        forecastRetrofitCaller = dagger.forecastRetrofitCaller();
+        schedulerFacade = dagger.schedulerFacade();
+        connectionFacade = dagger.connectionFacade();
+    }
 
     //region lifecycle
     @Override
@@ -79,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
         lastKnownLocation = null;
         inInitialState = true;
         locationFacade = new LocationFacade(this, locationCallbacks);
+        locationObservable = schedulerFacade.ioToBackground(locationFacade.getLocationObservable());
     }
 
     @Override
@@ -90,17 +100,7 @@ public class MainActivity extends AppCompatActivity {
             row. the reason this isn't in onCreate is so that it's after connect*/
             inInitialState = false;
             Toast.makeText(this, "Loading", Toast.LENGTH_SHORT).show();
-
-            //this is coded funny to avoid a race condition since askForLocation changes hasLocationPermission
-            if (locationFacade.hasLocationPermission()) {
-                locationObservable = schedulerFacade.ioToBackground(locationFacade.askForLocation());
-                //if already have permission then permission accepted callback won't be called so manually call takeLocation
-                takeLocation();
-            } else {
-                locationObservable = schedulerFacade.ioToBackground(locationFacade.askForLocation());
-                /*takeLocation will be called in the permission accepted callback.
-                can't do it here because no permission yet*/
-            }
+            requestLocation();
         }
     }
 
@@ -129,11 +129,8 @@ public class MainActivity extends AppCompatActivity {
     //region UI Callbacks
     public void refreshOnClick(View unused) {
         Toast.makeText(this, "Refreshing", Toast.LENGTH_SHORT).show();
-        /*ask for permission again if the initial was denied. this will then call permission accepted callback
-        which is takeLocation. else take a new location.*/
-        if (!locationFacade.hasLocationPermission())
-            locationObservable = schedulerFacade.ioToBackground(locationFacade.askForLocation());
-        else takeLocation();
+        //will only need to ask for permission if the initial was denied
+        requestLocation();
     }
 
     public void hourlyOnClick(View unused) {
@@ -145,7 +142,23 @@ public class MainActivity extends AppCompatActivity {
     }
     //endregion UI Callbacks
 
+    /**
+     * Handles permissions and taking the location
+     */
+    private void requestLocation() {
+        if (locationFacade.hasLocationPermission()) takeLocation();
+        else locationFacade.requestLocationPermission();
+        /*can't takeLocation right after requestLocationPermission because permission is another thread
+        permissionApprovedCallback is takeLocation so only call takeLocation if we already have permission*/
+    }
+
+    /**
+     * Does nothing if doesn't have location permission or location is disabled
+     */
     private void takeLocation() {
+        //only possible if a previous subscribe was never called (eg lack of permission)
+        if (locationDisposable != null) locationDisposable.dispose();
+        //this can't become a single Observable because I need to take on demand
         locationDisposable = locationObservable.take(1).subscribe(this::consumeLocation);
     }
 
@@ -153,12 +166,14 @@ public class MainActivity extends AppCompatActivity {
         lastKnownLocation = newLocation;
         locationDisposable.dispose();
         if (!connectionFacade.isConnectedToInternet(this)) {
-            //TODO: confirm this works on background thread
+            /*yes it is possible to turn off Wi-Fi and cell data without turning off GPS
+            and yes this dialogue will show even though consumeLocation is on a background thread.*/
             new InternetErrorDialogFragment().show(getFragmentManager(), "network_error_dialogue");
             return;
         }
-        //TODO: can these be composed into 1 Observable instead of 2?
 
+        //only possible if 2 locations were requested quickly but the internet is super slow
+        if (networkDisposable != null) networkDisposable.dispose();
         //don't make getForecast observable because it needs a new request every location also take(2) doesn't work
         networkDisposable = schedulerFacade.ioToUi(forecastRetrofitCaller.getForecast(newLocation.getLatitude(), newLocation.getLongitude()))
                 .subscribe(weatherCallbacks::onSuccess, weatherCallbacks::onError);

@@ -109,11 +109,9 @@ public class LocationFacade {
     }
 
     /**
-     * Will ask for location permission as needed.
-     *
-     * @return will never complete or error
+     * Will ask for location permission as needed. Does nothing if already have permission.
      */
-    public Observable<Location> askForLocation() {
+    public void requestLocationPermission() {
         if (!hasLocationPermission()) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(
                     activity, Manifest.permission.ACCESS_FINE_LOCATION)) {
@@ -132,7 +130,12 @@ public class LocationFacade {
                         REQUEST_LOCATION_PERMISSION_CODE);
             }
         }
+    }
 
+    /**
+     * @return will never complete or error
+     */
+    public Observable<Location> getLocationObservable() {
         return Observable.create(emitter -> {
             fusedLocationProviderClient.getLastLocation().addOnSuccessListener(activity, it -> {
                         // null means that it successfully contacted a disabled service...
