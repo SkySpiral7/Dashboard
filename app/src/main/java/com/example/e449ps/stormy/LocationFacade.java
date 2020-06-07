@@ -2,13 +2,9 @@ package com.example.e449ps.stormy;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationManager;
-import android.os.Build;
-import android.provider.Settings;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -103,33 +99,9 @@ public class LocationFacade {
     }
 
     public boolean hasLocationPermission() {
+        //TODO: test: ACCESS_COARSE_LOCATION ("city block") should be enough and saves battery
         return ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED;
-    }
-
-    //TODO: move these and Main's isConnectedToInternet to an Internet helper
-    public boolean isLocationEnabled() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            // This is a new method provided in API 28
-            LocationManager locationManager =
-                    (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
-            return locationManager.isLocationEnabled();
-        } else {
-            // This is Deprecated in API 28
-            // there's also manager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-            int mode =
-                    Settings.Secure.getInt(
-                            activity.getContentResolver(),
-                            Settings.Secure.LOCATION_MODE,
-                            Settings.Secure.LOCATION_MODE_OFF);
-            return (mode != Settings.Secure.LOCATION_MODE_OFF);
-        }
-    }
-
-    public boolean isAirplaneModeOn() {
-        return Settings.Global.getInt(
-                activity.getContentResolver(), Settings.Global.AIRPLANE_MODE_ON, 0)
-                != 0;
     }
 
     /**

@@ -1,11 +1,8 @@
 package com.example.e449ps.stormy.activity;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.text.method.LinkMovementMethod;
@@ -14,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.e449ps.stormy.ConnectionFacade;
 import com.example.e449ps.stormy.ForecastRetrofitCaller;
 import com.example.e449ps.stormy.LocationFacade;
 import com.example.e449ps.stormy.R;
@@ -51,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private WeatherConverter weatherConverter = Dagger.get().weatherConverter();
     private ForecastRetrofitCaller forecastRetrofitCaller = Dagger.get().forecastRetrofitCaller();
     private SchedulerFacade schedulerFacade = Dagger.get().schedulerFacade();
+    private ConnectionFacade connectionFacade = Dagger.get().connectionFacade();
     private DisplayWeather displayWeather;
     private LocationFacade locationFacade;
     /**
@@ -149,18 +148,16 @@ public class MainActivity extends AppCompatActivity {
 
     public void locationCallback(Location newLocation) {
         lastKnownLocation = newLocation;
-        getForecast(binding, lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
         locationDisposable.dispose();
-    }
+        if (!connectionFacade.isConnectedToInternet(this)) {
+            this.showInternetErrorDialog();
+            return;
+        }
+        //TODO: can these be composed into 1 Observable instead of 2?
 
-    /**
-     * @return true if {@code !airplaneMode && (Wi-Fi || cell data)}
-     */
-    private boolean isConnectedToInternet() {
-        ConnectivityManager manager =
-                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
-        return networkInfo != null && networkInfo.isConnected();
+        //don't make getForecast observable because it needs a new request every location also take(2) doesn't work
+        networkDisposable = schedulerFacade.ioToUi(forecastRetrofitCaller.getForecast(newLocation.getLatitude(), newLocation.getLongitude()))
+                .subscribe(this::onSuccess, this::onError);
     }
 
     public void hourlyOnClick(View unused) {
@@ -169,18 +166,6 @@ public class MainActivity extends AppCompatActivity {
         intent.putParcelableArrayListExtra(
                 HourlyForecastActivity.HOUR_EXTRA, new ArrayList<Parcelable>(hourlyWeather));
         startActivity(intent);
-    }
-
-    private void getForecast(final ActivityMainBinding binding, double latitude, double longitude) {
-        if (!this.isConnectedToInternet()) {
-            this.showInternetErrorDialog();
-            return;
-        }
-        //TODO: can network be Observable?
-        //TODO: can these be composed into 1 Observable instead of 2?
-
-        networkDisposable = schedulerFacade.ioToUi(forecastRetrofitCaller.getForecast(latitude, longitude))
-                .subscribe(this::onSuccess, this::onError);
     }
 
     private void onError(Throwable throwable) {
