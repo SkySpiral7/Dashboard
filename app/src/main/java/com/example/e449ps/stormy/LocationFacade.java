@@ -10,8 +10,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 
-import java.util.function.Consumer;
-
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -46,33 +44,37 @@ public class LocationFacade {
     private static final short REQUEST_LOCATION_PERMISSION_CODE = 2878;
 
     private final Activity activity;
-    private final Consumer<DialogInterface.OnClickListener> justificationFactory;
+    private final Callbacks callbacks;
 
     private GoogleApiClient googleApiClient;
-    //TODO: consider a single interface with all these callbacks
     private FusedLocationProviderClient fusedLocationProviderClient;
-    private Runnable permissionApprovedCallback;
-    private Runnable permissionDeniedCallback;
 
-    /**
-     * @param justificationFactory to avoid asking twice this needs to generate a single button dialogue.
-     *                             the android native prompt that follows handles declining
-     */
     public LocationFacade(
             Activity activity,
-            Consumer<DialogInterface.OnClickListener> justificationFactory,
-            Runnable permissionApprovedCallback,
-            Runnable permissionDeniedCallback) {
+            Callbacks callbacks) {
         this.activity = activity;
-        this.justificationFactory = justificationFactory;
-        this.permissionApprovedCallback = permissionApprovedCallback;
-        this.permissionDeniedCallback = permissionDeniedCallback;
+        this.callbacks = callbacks;
 
         googleApiClient = new GoogleApiClient.Builder(activity).addApi(LocationServices.API).build();
-
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(activity);
     }
 
+    public interface Callbacks {
+        default void permissionApprovedCallback() {
+        }
+
+        default void permissionDeniedCallback() {
+        }
+
+        /**
+         * to avoid asking twice this needs to generate a single button dialogue.
+         * the android native prompt that follows handles declining
+         */
+        default void justificationFactory(DialogInterface.OnClickListener onClickListener) {
+        }
+    }
+
+    //region Boilerplate
     public void connect() {
         googleApiClient.connect();
     }
@@ -91,15 +93,17 @@ public class LocationFacade {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // I don't think I need to check hasLocationPermission because I already checked the array
                 // for "granted"
-                permissionApprovedCallback.run();
+                callbacks.permissionApprovedCallback();
             } else {
-                permissionDeniedCallback.run();
+                callbacks.permissionDeniedCallback();
             }
         }
     }
+    //endregion Boilerplate
 
     public boolean hasLocationPermission() {
         //TODO: test: ACCESS_COARSE_LOCATION ("city block") should be enough and saves battery
+        //hold off on this. since traffic will probably need fine grain
         return ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED;
     }
@@ -113,7 +117,7 @@ public class LocationFacade {
         if (!hasLocationPermission()) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(
                     activity, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                justificationFactory.accept(
+                callbacks.justificationFactory(
                         (dialog, whichButton) -> {
                             // Prompt the user once explanation has been shown
                             ActivityCompat.requestPermissions(

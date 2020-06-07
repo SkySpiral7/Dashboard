@@ -60,7 +60,10 @@ public class MainActivity extends AppCompatActivity {
     private Disposable networkDisposable;
     private Disposable locationDisposable;
     private Observable<Location> locationObservable;
+    private WeatherCallbacks weatherCallbacks = new WeatherCallbacks();
+    private LocationCallbacks locationCallbacks = new LocationCallbacks();
 
+    //region lifecycle
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,8 +78,7 @@ public class MainActivity extends AppCompatActivity {
         displayWeather = null;
         lastKnownLocation = null;
         inInitialState = true;
-        Runnable permissionDeniedCallback = () -> Toast.makeText(this, "Denied: Can't load weather", Toast.LENGTH_SHORT).show();
-        locationFacade = new LocationFacade(this, this::locationRationalDialog, this::takeLocation, permissionDeniedCallback);
+        locationFacade = new LocationFacade(this, locationCallbacks);
     }
 
     @Override
@@ -103,6 +105,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onRequestPermissionsResult(
+            int requestCode, @NonNull String[] requestedPermissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, requestedPermissions, grantResults);
+        locationFacade.onRequestPermissionsResult(requestCode, requestedPermissions, grantResults);
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
         locationFacade.disconnect();
@@ -115,49 +124,16 @@ public class MainActivity extends AppCompatActivity {
         if (networkDisposable != null) networkDisposable.dispose();
         if (locationDisposable != null) locationDisposable.dispose();
     }
+    //endregion lifecycle
 
-    @Override
-    public void onRequestPermissionsResult(
-            int requestCode, @NonNull String[] requestedPermissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, requestedPermissions, grantResults);
-        locationFacade.onRequestPermissionsResult(requestCode, requestedPermissions, grantResults);
-    }
-
+    //region UI Callbacks
     public void refreshOnClick(View unused) {
-        Toast.makeText(MainActivity.this, "Refreshing", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Refreshing", Toast.LENGTH_SHORT).show();
         /*ask for permission again if the initial was denied. this will then call permission accepted callback
         which is takeLocation. else take a new location.*/
         if (!locationFacade.hasLocationPermission())
             locationObservable = schedulerFacade.ioToBackground(locationFacade.askForLocation());
         else takeLocation();
-    }
-
-    private void takeLocation() {
-        locationDisposable = locationObservable.take(1).subscribe(this::locationCallback);
-    }
-
-    public void locationRationalDialog(DialogInterface.OnClickListener listener) {
-        new AlertDialog.Builder(this)
-                .setTitle(R.string.title_location_permission)
-                .setMessage(R.string.text_location_permission)
-                .setPositiveButton(R.string.open_permission_button, listener)
-                .setCancelable(false)
-                .create()
-                .show();
-    }
-
-    public void locationCallback(Location newLocation) {
-        lastKnownLocation = newLocation;
-        locationDisposable.dispose();
-        if (!connectionFacade.isConnectedToInternet(this)) {
-            this.showInternetErrorDialog();
-            return;
-        }
-        //TODO: can these be composed into 1 Observable instead of 2?
-
-        //don't make getForecast observable because it needs a new request every location also take(2) doesn't work
-        networkDisposable = schedulerFacade.ioToUi(forecastRetrofitCaller.getForecast(newLocation.getLatitude(), newLocation.getLongitude()))
-                .subscribe(this::onSuccess, this::onError);
     }
 
     public void hourlyOnClick(View unused) {
@@ -167,26 +143,63 @@ public class MainActivity extends AppCompatActivity {
                 HourlyForecastActivity.HOUR_EXTRA, new ArrayList<Parcelable>(hourlyWeather));
         startActivity(intent);
     }
+    //endregion UI Callbacks
 
-    private void onError(Throwable throwable) {
-        Timber.e(throwable, "internet call failed");
-        this.alertUserAboutError();
-        networkDisposable.dispose();
+    private void takeLocation() {
+        locationDisposable = locationObservable.take(1).subscribe(this::consumeLocation);
     }
 
-    private void onSuccess(Forecast forecast) {
-        displayWeather = weatherConverter.getCurrentDetails(forecast);
-        binding.setWeather(displayWeather.getCurrentWeather());
-        iconImageView.setImageDrawable(getDrawable(displayWeather.getCurrentWeather().getIconId()));
-        networkDisposable.dispose();
+    private void consumeLocation(Location newLocation) {
+        lastKnownLocation = newLocation;
+        locationDisposable.dispose();
+        if (!connectionFacade.isConnectedToInternet(this)) {
+            //TODO: confirm this works on background thread
+            new InternetErrorDialogFragment().show(getFragmentManager(), "network_error_dialogue");
+            return;
+        }
+        //TODO: can these be composed into 1 Observable instead of 2?
+
+        //don't make getForecast observable because it needs a new request every location also take(2) doesn't work
+        networkDisposable = schedulerFacade.ioToUi(forecastRetrofitCaller.getForecast(newLocation.getLatitude(), newLocation.getLongitude()))
+                .subscribe(weatherCallbacks::onSuccess, weatherCallbacks::onError);
     }
 
-    private void alertUserAboutError() {
-        GeneralErrorDialogFragment dialog = new GeneralErrorDialogFragment();
-        dialog.show(getFragmentManager(), "error_dialogue");
+    private class LocationCallbacks implements LocationFacade.Callbacks {
+        @Override
+        public void permissionApprovedCallback() {
+            MainActivity.this.takeLocation();
+        }
+
+        @Override
+        public void permissionDeniedCallback() {
+            Toast.makeText(MainActivity.this, "Denied: Can't load weather", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void justificationFactory(DialogInterface.OnClickListener listener) {
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle(R.string.title_location_permission)
+                    .setMessage(R.string.text_location_permission)
+                    .setPositiveButton(R.string.open_permission_button, listener)
+                    .setCancelable(false)
+                    .create()
+                    .show();
+        }
     }
 
-    private void showInternetErrorDialog() {
-        new InternetErrorDialogFragment().show(getFragmentManager(), "network_error_dialogue");
+    private class WeatherCallbacks {
+        private void onSuccess(Forecast forecast) {
+            displayWeather = weatherConverter.getCurrentDetails(forecast);
+            binding.setWeather(displayWeather.getCurrentWeather());
+            iconImageView.setImageDrawable(getDrawable(displayWeather.getCurrentWeather().getIconId()));
+            networkDisposable.dispose();
+        }
+
+        private void onError(Throwable throwable) {
+            Timber.e(throwable, "internet call failed");
+            GeneralErrorDialogFragment dialog = new GeneralErrorDialogFragment();
+            dialog.show(getFragmentManager(), "error_dialogue");
+            networkDisposable.dispose();
+        }
     }
 }
