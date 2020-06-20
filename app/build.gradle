@@ -48,6 +48,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.1.0'
 
     //for main
+    //TODO: GithubBrowserSample has this great versions.gradle
     def daggerVersion = '2.24'
     def okhttpVersion = '4.1.1'
     def retrofitVersion = '2.8.1'
@@ -130,6 +131,7 @@ private void createReporterTask(Task previousTask, String reportPath) {
     }]
 }
 
+//TODO: is this redundant with newer studio?
 private void displayReport(String filePath) {
     if (System.properties['os.name'].toLowerCase().contains('windows')) {
         filePath = filePath.replace("\\", "/")

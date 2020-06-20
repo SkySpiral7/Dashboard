@@ -5,6 +5,6 @@ import javax.inject.Singleton;
 import dagger.Component;
 
 @Singleton
-@Component(modules = {StormModule.class})
-public interface StormComponent extends MyAppDependencies, StormModuleDependencies {
+@Component(modules = {StormModule.class, ViewModelModule.class})
+public interface StormComponent extends MyAppDependencies {
 }
