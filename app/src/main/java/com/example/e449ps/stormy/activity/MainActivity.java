@@ -32,6 +32,26 @@ import androidx.databinding.DataBindingUtil;
 import io.reactivex.disposables.Disposable;
 import timber.log.Timber;
 
+/*TODO: redesign for pollen and traffic
+will need to update screen to all fit on 1 screen. hourly weather/traffic is also fine
+weather: dark sky is shutting down end of 2021 :(
+    https://www.google.com/search?q=weather+%22api%22
+pollen: couldn't find one that had free pollen API. may have to web scrap
+    to scrape use https://jsoup.org/download implementation 'org.jsoup:jsoup:1.13.1'
+    https://www.weatherbit.io/pricing no free pollen
+        https://www.weatherbit.io/api/airquality-current
+    https://breezometer.com/plans no free pollen
+        https://docs.breezometer.com/api-documentation/pollen-api/v2/#examples
+    the rest of google results didn't seem to have a public API.
+    web scrapping seems legal for this
+    needs lots of digging: https://www.pollen.com/forecast/current/pollen/63376
+    requires digging: https://www.claritin.com/about-allergies/outdoor-seasonal-allergies
+    has embedded JSON but need to dig searching https://weather.com/forecast/allergy/l/d7aecd79078138bfe7da4afacf513b350c8330cc564759af60e935b176e602a6
+    has embedded JSON but harder to dig searching https://www.accuweather.com/en/us/saint-peters/63376/allergies-weather/339094
+traffic: I have a google API key for map but looks like traffic costs money.
+    https://developers.google.com/maps/documentation/directions/intro
+    will have to throw to map app instead
+*/
 public class MainActivity extends AppCompatActivity {
     private ImageView iconImageView;
     private ActivityMainBinding binding;
